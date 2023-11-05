@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 const { socketController } = require('../sockets/controller');
 
 const { dbConnection } = require('../database/config');
+const Game = require('./game');
 
 class Server {
 
@@ -12,6 +13,8 @@ class Server {
         this.port = process.env.PORT;
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server);
+
+        this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0);
 
         this.paths = {
             auth:       '/api/auth',
