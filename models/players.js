@@ -143,6 +143,8 @@ class Players {
                 processed: false
             }
         }
+
+        //console.log("index:", index, "QUE ES ESTO?:", this.jugadores)
         let cartas = this.jugadores[index].cartas
         return {
             processed: true,
@@ -231,6 +233,22 @@ class Players {
             }
         }
         return this.dejoUnoById(ix)
+    }
+
+    quitarJugadorByJugador(jugador = new Player()) {
+        let ix = this.getIndexByJugador(jugador)
+        if (ix < 0) {
+            return {
+                processed: false
+            }
+        }
+        this.jugadores = this.jugadores.filter ((j,index) => {
+            if(index != ix) {
+                return true
+            } else {
+                return false
+            }
+        })
     }
 
 }

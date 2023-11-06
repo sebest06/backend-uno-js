@@ -36,10 +36,12 @@ class Game {
       levanto: false, //ya levanto
       color: "",
       espejito, //si se juega con espejito o no
+      finalizo: false
     };
 
-    this.players = new Players(jugadores);
-    this.pila = [];
+    this.players = new Players(jugadores)
+    this.ganadores = []
+    this.pila = []
 
     this.pila = this.crearMBarajasCartas(
       Math.floor(jugadores.length / 4) + 1
@@ -56,11 +58,14 @@ class Game {
 
 
     let salida;
-    console.log("TURNO:", this.elJuego.turno)
+    console.log("A-TURNO:", this.elJuego.turno, this.players.getPlayerById(0).player)
     salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+
+    console.log("A-TURNO:", this.elJuego.turno, this.players.getPlayerById(0).player)
     salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    console.log("TURNO:", this.elJuego.turno)
 
     salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(2).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
@@ -86,6 +91,8 @@ class Game {
   }
 
   arbitrarJugada({ estado, jugador, carta, penalizado, reportado, color }) {
+
+    console.log("PENAL", penalizado, "ESTADO", estado)
     if (!penalizado) {
       switch (estado) {
         case 'levanto':
@@ -98,26 +105,29 @@ class Game {
           if (this.esUnaJugadaValida(carta[0])) {
             this.descarte.push(carta)
             this.players.descartarCartaByJugador(jugador, carta);
+            this.siguienteTurno(jugador, carta ? carta[0] : undefined, color)
           } else {
             this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
             this.pila = this.pila.slice(1)
+            this.siguienteTurno(jugador, undefined, color)
           }
-          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          
           break;
         case 'paso':
           this.elJuego.levanto = false;
-          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          this.siguienteTurno(jugador, undefined, color)
           break;
         case 'espejito':
           this.elJuego.levanto = false;
           if (this.esUnaJugadaValida(carta[0])) {
             this.descarte.push(carta)
             this.players.descartarCartaByJugador(jugador, carta);
+            this.siguienteTurno(jugador, carta ? carta[0] : undefined, color)
           } else {
             this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
             this.pila = this.pila.slice(1)
           }
-          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          
           break;
         case 'uno':
           break;
@@ -125,9 +135,19 @@ class Game {
           break
         default:
       }
+
+      if (this.players.getCartasByJugador(jugador).cartas.length) {
+        this.ganadores.push(jugador.nombre)
+        this.players.quitarJugadorByJugador(jugador)
+        this.elJuego.jugadores = this.elJuego.jugadores - 1
+      }
+      if (this.elJuego.jugadores == 1) {
+        this.elJuego.finalizo = true
+      }
     } else {
       this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
       this.pila = this.pila.slice(1)
+      this.siguienteTurno(jugador, undefined, color)
     }
 
     return {
@@ -147,9 +167,11 @@ class Game {
   }
 
   siguienteTurno(jugador, carta, color) {
+
+    console.log("Pasa de turno")
     this.elJuego.ronda = this.players.getIndexByJugador(jugador)
 
-    if(!carta){
+    if (!carta) {
       if (this.elJuego.direccion) {
         this.elJuego.ronda = this.elJuego.ronda + 1;
       } else {
@@ -159,26 +181,63 @@ class Game {
           this.elJuego.ronda = this.elJuego.jugadores - 1;
         }
       }
+      console.log("Direccion", this.elJuego.direccion, "ronda", this.elJuego.ronda)
     } else {
-    switch (carta.valor) {
-      case "bloquear":
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 2;
-        } else {
-          if (this.elJuego.ronda > 1) {
-            this.elJuego.ronda = this.elJuego.ronda - 2;
+      switch (carta.valor) {
+        case "bloquear":
+          if (this.elJuego.direccion) {
+            this.elJuego.ronda = this.elJuego.ronda + 2;
           } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 2;
+            if (this.elJuego.ronda > 1) {
+              this.elJuego.ronda = this.elJuego.ronda - 2;
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 2;
+            }
           }
-        }
-        break;
-      case "girar":
-        if (this.elJuego.direccion) {
-          this.elJuego.direccion = false;
-        } else {
-          this.elJuego.direccion = true;
-        }
-        if (this.elJuego.jugadores < 2) {
+          break;
+        case "girar":
+          if (this.elJuego.direccion) {
+            this.elJuego.direccion = false;
+          } else {
+            this.elJuego.direccion = true;
+          }
+          if (this.elJuego.jugadores < 2) {
+            if (this.elJuego.direccion) {
+              this.elJuego.ronda = this.elJuego.ronda + 1;
+            } else {
+              if (this.elJuego.ronda > 0) {
+                this.elJuego.ronda = this.elJuego.ronda - 1;
+              } else {
+                this.elJuego.ronda = this.elJuego.jugadores - 1;
+              }
+            }
+          }
+          break;
+        case "+2":
+          if (this.elJuego.direccion) {
+            this.elJuego.ronda = this.elJuego.ronda + 2;
+          } else {
+            if (this.elJuego.ronda > 1) {
+              this.elJuego.ronda = this.elJuego.ronda - 2;
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 2;
+            }
+          }
+          break;
+        case "+4":
+          this.elJuego.color = color
+          if (this.elJuego.direccion) {
+            this.elJuego.ronda = this.elJuego.ronda + 2;
+          } else {
+            if (this.elJuego.ronda > 1) {
+              this.elJuego.ronda = this.elJuego.ronda - 2;
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 2;
+            }
+          }
+          break;
+        case "comodin":
+          this.elJuego.color = color
           if (this.elJuego.direccion) {
             this.elJuego.ronda = this.elJuego.ronda + 1;
           } else {
@@ -188,55 +247,24 @@ class Game {
               this.elJuego.ronda = this.elJuego.jugadores - 1;
             }
           }
-        }
-        break;
-      case "+2":
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 2;
-        } else {
-          if (this.elJuego.ronda > 1) {
-            this.elJuego.ronda = this.elJuego.ronda - 2;
+          break;
+        default:
+          if (this.elJuego.direccion) {
+            this.elJuego.ronda = this.elJuego.ronda + 1;
           } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 2;
+            if (this.elJuego.ronda > 0) {
+              this.elJuego.ronda = this.elJuego.ronda - 1;
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 1;
+            }
           }
-        }
-        break;
-      case "+4":
-        this.elJuego.color = color
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 2;
-        } else {
-          if (this.elJuego.ronda > 1) {
-            this.elJuego.ronda = this.elJuego.ronda - 2;
-          } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 2;
-          }
-        }
-        break;
-      case "comodin":
-        this.elJuego.color = color
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 1;
-        } else {
-          if (this.elJuego.ronda > 0) {
-            this.elJuego.ronda = this.elJuego.ronda - 1;
-          } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 1;
-          }
-        }
-        break;
-      default:
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 1;
-        } else {
-          if (this.elJuego.ronda > 0) {
-            this.elJuego.ronda = this.elJuego.ronda - 1;
-          } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 1;
-          }
-        }
       }
     }
+    const {processed, player} = this.players.getPlayerById(this.elJuego.ronda % this.elJuego.jugadores)
+    if(!processed) {
+      throw "ERROR"
+    }
+    this.elJuego.turno = player.nombre
   }
 
   levantarCartaDePila(jugador = new Player(), n = 1) {
@@ -291,10 +319,17 @@ class Game {
 
     if (this.elJuego.turno === jugador.nombre) {
 
-      if (!carta) {
+      if (!carta && this.elJuego.levanto) {
         let estado = 'paso'
+      } else {
+        return {
+          carta,
+          jugador,
+          estado,
+          penalizado: true,
+        }
       }
-      
+
       return {
         carta,
         jugador,
@@ -312,6 +347,7 @@ class Game {
   }
   pasarTurnoSinJugar(jugador = new Player()) {
     let estado = 'paso'
+    console.log("turno",this.elJuego.turno,jugador.nombre)
     if (this.elJuego.levanto && this.elJuego.turno === jugador.nombre) {
       return {
         jugador,
