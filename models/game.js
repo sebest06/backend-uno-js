@@ -1,3 +1,5 @@
+const { Player, Players } = require('./players.js')
+
 class Carta {
   constructor({ color, valor }) {
     this.color = color;
@@ -8,13 +10,6 @@ class Carta {
   }
 }
 
-class Player {
-  constructor({ nombre, cartas = [] }) {
-    this.nombre = nombre;
-    this.saidUno = false;
-    this.cartas = cartas;
-  }
-}
 
 class Game {
   /* TODO:
@@ -28,93 +23,233 @@ class Game {
         * Carta
         * Jugador
         * Arbitro 
+    Cosas a considerar:
+        * Que pasa cuando no hay mas cartas para robar
     */
 
   constructor(jugadores = [], ronda = 0, espejito = 0) {
     this.elJuego = {
+      jugadores: jugadores.length,
       ronda, //quien juega
       direccion: true, //para donde sigue el juego
       turno: jugadores[ronda % jugadores.length].nombre, //de quien es el turno
       levanto: false, //ya levanto
+      color: "",
       espejito, //si se juega con espejito o no
     };
 
-    //this.arbitro = false
-    this.jugadores = [];
+    this.players = new Players(jugadores);
     this.pila = [];
-    /*this.ronda = ronda
-    this.direccion = true*/
 
     this.pila = this.crearMBarajasCartas(
-      Math.floor(this.jugadores.length / 4) + 1
+      Math.floor(jugadores.length / 4) + 1
     );
     this.pila = this.mezclarBarajas(this.pila);
-    /*console.log("Cartas en la pila:", this.pila.length)
-    this.pila.forEach((carta) => {
-      console.log(carta.nombre())
-    })*/
 
-    jugadores.forEach((jugador) => {
-      const unPlayer = new Player({
-        nombre: jugador.nombre,
-        cartas: this.pila.slice(0, 7),
-      });
-      this.jugadores.push(unPlayer);
+    jugadores.forEach((jugador, ix) => {
+      this.players.darCartaByIndex(ix, this.pila.slice(0, 7))
       this.pila = this.pila.slice(7);
-
-      /*unPlayer.cartas.forEach((carta) => {
-        console.log(jugador.nombre, carta.nombre());
-      });*/
     });
 
     this.descarte = this.pila.slice(0, 1);
     this.pila = this.pila.slice(1);
 
-    /*
+
     let salida;
-    console.log("TURNO:",this.elJuego.turno)
-    salida = this.levantarCartaDePila(this.jugadores[0])
+    console.log("TURNO:", this.elJuego.turno)
+    salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-    salida = this.pasarTurnoSinJugar(this.jugadores[0])
-    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-
-    salida = this.pasarTurnoSinJugar(this.jugadores[2])
+    salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
 
-    salida = this.levantarCartaDePila(this.jugadores[0])
+    salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(2).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
 
-    this.descartarCarta(this.jugadores[0], this.jugadores[0].cartas[1])
-    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(0).player))
+    salida.penalizado != false ? console.log("OK") : console.log("FAIL")
+
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(0).player, this.players.getPlayerById(0).player.cartas[1]))
+    salida.penalizado != false ? console.log("OK") : console.log("FAIL")
 
 
-    console.log("TURNO:",this.elJuego.turno)
-    salida = this.levantarCartaDePila(this.jugadores[1])
+    console.log("TURNO:", this.elJuego.turno)
+    salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(1).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-    salida = this.pasarTurnoSinJugar(this.jugadores[1])
+    salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(1).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
 
-    console.log("TURNO:",this.elJuego.turno)
-    salida = this.levantarCartaDePila(this.jugadores[2])
+    console.log("TURNO:", this.elJuego.turno)
+    salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(2).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-    this.descartarCarta(this.jugadores[2], this.jugadores[2].cartas[1])
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(2).player, this.players.getPlayerById(2).player.cartas[1]))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-    */
   }
 
-  arbitrarJugada({estado, jugador, carta, penalizado, reportado}) {
-        
-    
+  arbitrarJugada({ estado, jugador, carta, penalizado, reportado, color }) {
+    if (!penalizado) {
+      switch (estado) {
+        case 'levanto':
+          this.elJuego.levanto = true;
+          this.players.darCartaByJugador(jugador, carta)
+          this.pila = this.pila.slice(carta.length)
+          break;
+        case 'descarto':
+          this.elJuego.levanto = false;
+          if (this.esUnaJugadaValida(carta[0])) {
+            this.descarte.push(carta)
+            this.players.descartarCartaByJugador(jugador, carta);
+          } else {
+            this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
+            this.pila = this.pila.slice(1)
+          }
+          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          break;
+        case 'paso':
+          this.elJuego.levanto = false;
+          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          break;
+        case 'espejito':
+          this.elJuego.levanto = false;
+          if (this.esUnaJugadaValida(carta[0])) {
+            this.descarte.push(carta)
+            this.players.descartarCartaByJugador(jugador, carta);
+          } else {
+            this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
+            this.pila = this.pila.slice(1)
+          }
+          this.siguienteTurno(jugador, carta?carta[0]:undefined, color)
+          break;
+        case 'uno':
+          break;
+        case 'reporto':
+          break
+        default:
+      }
+    } else {
+      this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
+      this.pila = this.pila.slice(1)
+    }
+
+    return {
+      carta,
+      jugador,
+      estado,
+      penalizado,
+      reportado
+    }
   }
 
-  levantarCartaDePila(jugador = new Player()) {
-    let carta = this.pila.slice(0, 1);
+  esUnaJugadaValida(carta) {
+    const descarte = this.descarte.slice(0, 1);
+    if (carta.color == "negro" || carta.color == descarte[0].color || carta.valor == descarte[0].valor || (descarte.color == "negro" && this.elJuego.color == carta.color)) {
+      return true
+    }
+  }
+
+  siguienteTurno(jugador, carta, color) {
+    this.elJuego.ronda = this.players.getIndexByJugador(jugador)
+
+    if(!carta){
+      if (this.elJuego.direccion) {
+        this.elJuego.ronda = this.elJuego.ronda + 1;
+      } else {
+        if (this.elJuego.ronda > 0) {
+          this.elJuego.ronda = this.elJuego.ronda - 1;
+        } else {
+          this.elJuego.ronda = this.elJuego.jugadores - 1;
+        }
+      }
+    } else {
+    switch (carta.valor) {
+      case "bloquear":
+        if (this.elJuego.direccion) {
+          this.elJuego.ronda = this.elJuego.ronda + 2;
+        } else {
+          if (this.elJuego.ronda > 1) {
+            this.elJuego.ronda = this.elJuego.ronda - 2;
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 2;
+          }
+        }
+        break;
+      case "girar":
+        if (this.elJuego.direccion) {
+          this.elJuego.direccion = false;
+        } else {
+          this.elJuego.direccion = true;
+        }
+        if (this.elJuego.jugadores < 2) {
+          if (this.elJuego.direccion) {
+            this.elJuego.ronda = this.elJuego.ronda + 1;
+          } else {
+            if (this.elJuego.ronda > 0) {
+              this.elJuego.ronda = this.elJuego.ronda - 1;
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 1;
+            }
+          }
+        }
+        break;
+      case "+2":
+        if (this.elJuego.direccion) {
+          this.elJuego.ronda = this.elJuego.ronda + 2;
+        } else {
+          if (this.elJuego.ronda > 1) {
+            this.elJuego.ronda = this.elJuego.ronda - 2;
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 2;
+          }
+        }
+        break;
+      case "+4":
+        this.elJuego.color = color
+        if (this.elJuego.direccion) {
+          this.elJuego.ronda = this.elJuego.ronda + 2;
+        } else {
+          if (this.elJuego.ronda > 1) {
+            this.elJuego.ronda = this.elJuego.ronda - 2;
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 2;
+          }
+        }
+        break;
+      case "comodin":
+        this.elJuego.color = color
+        if (this.elJuego.direccion) {
+          this.elJuego.ronda = this.elJuego.ronda + 1;
+        } else {
+          if (this.elJuego.ronda > 0) {
+            this.elJuego.ronda = this.elJuego.ronda - 1;
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 1;
+          }
+        }
+        break;
+      default:
+        if (this.elJuego.direccion) {
+          this.elJuego.ronda = this.elJuego.ronda + 1;
+        } else {
+          if (this.elJuego.ronda > 0) {
+            this.elJuego.ronda = this.elJuego.ronda - 1;
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 1;
+          }
+        }
+      }
+    }
+  }
+
+  levantarCartaDePila(jugador = new Player(), n = 1) {
+
+    if (this.pila.length <= n) {
+      this.pila.push(this.descarte.slice(1))
+      this.descarte = this.descarte.slice(0, 1)
+      this.pila = this.mezclarBarajas(this.pila)
+    }
+
+    let carta = this.pila.slice(0, n);
     let estado = 'levanto'
-    
-    //console.log("TEST LEVANTAR: levanto", this.elJuego.levanto, "jugador: ", this.elJuego.turno, jugador.nombre)
     if (!this.elJuego.levanto && this.elJuego.turno === jugador.nombre) {
-      //levantara una carta y podrá jugar
-      this.elJuego.levanto = true;
       return {
         carta,
         jugador,
@@ -122,7 +257,6 @@ class Game {
         penalizado: false,
       }
     } else {
-      //levantara una carta en penalización
       return {
         carta,
         jugador,
@@ -132,34 +266,21 @@ class Game {
     }
   }
 
-  descartarCarta(jugador = new Player(), carta) {
+  descartarCarta(jugador = new Player(), carta, color) {
     let estado = 'descarto'
+
     if (!jugador.cartas.includes(carta)) {
       return {
         carta,
         jugador,
         estado,
+        color,
         penalizado: true,
       };
     }
 
     if (this.elJuego.espejito && carta == this.descarte.slice(0, 1)) {
-        this.elJuego.levanto = false;
-
-        this.elJuego.ronda = this.jugadores.indexOf(jugador)
-
-        if (this.elJuego.direccion) {
-            this.elJuego.ronda = this.elJuego.ronda+1;
-          } else {
-            if (this.elJuego.ronda > 0) {
-              this.elJuego.ronda = this.elJuego.ronda-1;
-            } else {
-              this.elJuego.ronda = this.jugadores.length - 1;
-            }
-          }
-          this.elJuego.turno =
-            this.jugadores[this.elJuego.ronda % this.jugadores.length].nombre;
-
+      let estado = 'espejito'
       return {
         carta,
         jugador,
@@ -170,20 +291,10 @@ class Game {
 
     if (this.elJuego.turno === jugador.nombre) {
 
-      this.elJuego.levanto = false;
-      if (this.elJuego.direccion) {
-        this.elJuego.ronda = this.elJuego.ronda+1;
-      } else {
-        if (this.elJuego.ronda > 0) {
-          this.elJuego.ronda = this.elJuego.ronda-1;
-        } else {
-          this.elJuego.ronda = this.jugadores.length - 1;
-        }
+      if (!carta) {
+        let estado = 'paso'
       }
-
-      this.elJuego.turno =
-        this.jugadores[this.elJuego.ronda % this.jugadores.length].nombre;
-      //descarta la carta y pasa al siguiente jugador
+      
       return {
         carta,
         jugador,
@@ -191,7 +302,6 @@ class Game {
         penalizado: false,
       };
     } else {
-      //no puede descartar la carta y es penalizado
       return {
         carta,
         jugador,
@@ -203,18 +313,6 @@ class Game {
   pasarTurnoSinJugar(jugador = new Player()) {
     let estado = 'paso'
     if (this.elJuego.levanto && this.elJuego.turno === jugador.nombre) {
-        this.elJuego.levanto = false;
-      if (this.elJuego.direccion) {
-        this.elJuego.ronda = this.elJuego.ronda+1;
-      } else {
-        if (this.elJuego.ronda > 0) {
-          this.elJuego.ronda = this.elJuego.ronda-1;
-        } else {
-          this.elJuego.ronda = this.jugadores.length - 1;
-        }
-      }
-      this.elJuego.turno =
-        this.jugadores[this.elJuego.ronda % this.jugadores.length].nombre;
       return {
         jugador,
         estado,
@@ -225,43 +323,43 @@ class Game {
       return {
         jugador,
         estado,
-        penalizado: false
+        penalizado: true
       };
     }
   }
 
-  decirUNO(jugador = new Player()){
+  decirUNO(jugador = new Player()) {
     let estado = 'uno'
-    if (jugador.cartas.length < 2){
-        return {
-            jugador,
-            estado,
-            penalizado: false
-        }
-    }else {
-        return {
-            jugador,
-            estado,
-            penalizado: true
-        }
+    if (jugador.cartas.length < 2) {
+      return {
+        jugador,
+        estado,
+        penalizado: false
+      }
+    } else {
+      return {
+        jugador,
+        estado,
+        penalizado: true
+      }
     }
   }
 
   reportarJugadorConUnaCarta(jugador = new Player(), reportado = new Player()) {
-    let estado="reporta"
-    if(this.elJuego.levanto && reportado.cartas.length == 1){
-        return {
-            jugador,
-            reportado,
-            estado,
-            penalizado: false
-        }
-    }else {
-        return {
-            jugador,
-            estado,
-            penalizado: false
-        }
+    let estado = "reporta"
+    if (this.elJuego.levanto && reportado.cartas.length == 1) {
+      return {
+        jugador,
+        reportado,
+        estado,
+        penalizado: false
+      }
+    } else {
+      return {
+        jugador,
+        estado,
+        penalizado: false
+      }
     }
   }
 
