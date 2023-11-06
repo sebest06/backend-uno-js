@@ -102,11 +102,11 @@ class Game {
     */
   }
 
-  revisarJugada({estado, jugador, carta, penalizado, reportado}) {
+  arbitrarJugada({estado, jugador, carta, penalizado, reportado}) {
         
-
+    
   }
-  
+
   levantarCartaDePila(jugador = new Player()) {
     let carta = this.pila.slice(0, 1);
     let estado = 'levanto'
