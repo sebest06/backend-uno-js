@@ -58,15 +58,13 @@ class Game {
 
 
     let salida;
-    console.log("A-TURNO:", this.elJuego.turno, this.players.getPlayerById(0).player)
+    console.log("TURNO:", this.elJuego.turno)
     salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-
-    console.log("A-TURNO:", this.elJuego.turno, this.players.getPlayerById(0).player)
     salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(0).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
-    console.log("TURNO:", this.elJuego.turno)
 
+    console.log("TURNO:", this.elJuego.turno)
     salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(2).player))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
 
@@ -91,8 +89,6 @@ class Game {
   }
 
   arbitrarJugada({ estado, jugador, carta, penalizado, reportado, color }) {
-
-    console.log("PENAL", penalizado, "ESTADO", estado)
     if (!penalizado) {
       switch (estado) {
         case 'levanto':
@@ -111,7 +107,7 @@ class Game {
             this.pila = this.pila.slice(1)
             this.siguienteTurno(jugador, undefined, color)
           }
-          
+
           break;
         case 'paso':
           this.elJuego.levanto = false;
@@ -127,7 +123,7 @@ class Game {
             this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
             this.pila = this.pila.slice(1)
           }
-          
+
           break;
         case 'uno':
           break;
@@ -136,7 +132,7 @@ class Game {
         default:
       }
 
-      if (this.players.getCartasByJugador(jugador).cartas.length) {
+      if (this.players.getCartasByJugador(jugador).cartas.length == 0) {
         this.ganadores.push(jugador.nombre)
         this.players.quitarJugadorByJugador(jugador)
         this.elJuego.jugadores = this.elJuego.jugadores - 1
@@ -168,7 +164,6 @@ class Game {
 
   siguienteTurno(jugador, carta, color) {
 
-    console.log("Pasa de turno")
     this.elJuego.ronda = this.players.getIndexByJugador(jugador)
 
     if (!carta) {
@@ -181,7 +176,6 @@ class Game {
           this.elJuego.ronda = this.elJuego.jugadores - 1;
         }
       }
-      console.log("Direccion", this.elJuego.direccion, "ronda", this.elJuego.ronda)
     } else {
       switch (carta.valor) {
         case "bloquear":
@@ -260,8 +254,8 @@ class Game {
           }
       }
     }
-    const {processed, player} = this.players.getPlayerById(this.elJuego.ronda % this.elJuego.jugadores)
-    if(!processed) {
+    const { processed, player } = this.players.getPlayerById(this.elJuego.ronda % this.elJuego.jugadores)
+    if (!processed) {
       throw "ERROR"
     }
     this.elJuego.turno = player.nombre
@@ -347,7 +341,6 @@ class Game {
   }
   pasarTurnoSinJugar(jugador = new Player()) {
     let estado = 'paso'
-    console.log("turno",this.elJuego.turno,jugador.nombre)
     if (this.elJuego.levanto && this.elJuego.turno === jugador.nombre) {
       return {
         jugador,

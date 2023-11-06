@@ -1,8 +1,9 @@
 class Player {
-    constructor({ nombre, cartas = [] }) {
+    constructor({ id, nombre, cartas = [] }) {
         this.nombre = nombre;
         this.saidUno = false;
         this.cartas = cartas;
+        this.id = id;
     }
 }
 
@@ -11,11 +12,13 @@ class Player {
 class Players {
     constructor(lista_jugadores = []) {
         this.jugadores = [];
+        let ix = 0;
         lista_jugadores.forEach((jugador) => {
             const unPlayer = new Player({
+                id: ix++,
                 nombre: jugador.nombre,
                 cartas: [],
-                saidUno: false
+                saidUno: false                
             });
             this.jugadores.push(unPlayer);
         })
@@ -40,9 +43,14 @@ class Players {
                 processed: false
             }
         }
+
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === id
+        })
+
         return {
             processed: true,
-            player: this.jugadores[id]
+            player: this.jugadores[ix]
         }
     }
     getPlayerByNombre(nombre = ""){
@@ -64,10 +72,15 @@ class Players {
                 processed: false
             }
         }
-        let _cartas = this.jugadores[index].cartas
+
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
+        let _cartas = this.jugadores[ix].cartas
         _cartas.push(cartas)
-        this.jugadores[index].cartas = _cartas
-        this.jugadores[index].saidUno = false
+        this.jugadores[ix].cartas = _cartas
+        this.jugadores[ix].saidUno = false
         return {
             processed: true
         }
@@ -98,7 +111,12 @@ class Players {
                 processed: false
             }
         }
-        let _cartas = this.jugadores[index].cartas
+
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
+        let _cartas = this.jugadores[ix].cartas
 
         if (!_cartas.includes(cartas)) {
             return {
@@ -112,7 +130,7 @@ class Players {
             }
             return false
         })
-        this.jugadores[index].cartas = _cartas
+        this.jugadores[ix].cartas = _cartas
 
         return {
             processed: true
@@ -144,8 +162,12 @@ class Players {
             }
         }
 
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
         //console.log("index:", index, "QUE ES ESTO?:", this.jugadores)
-        let cartas = this.jugadores[index].cartas
+        let cartas = this.jugadores[ix].cartas
         return {
             processed: true,
             cartas
@@ -176,7 +198,12 @@ class Players {
                 processed: false
             }
         }
-        this.jugadores[index].saidUno = true
+
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
+        this.jugadores[ix].saidUno = true
         return {
             processed: true,
         }
@@ -209,9 +236,13 @@ class Players {
             }
         }
 
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
         return {
             processed: true,
-            uno: this.jugadores[index].saidUno
+            uno: this.jugadores[ix].saidUno
         }
     }
 
@@ -236,6 +267,7 @@ class Players {
     }
 
     quitarJugadorByJugador(jugador = new Player()) {
+
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
