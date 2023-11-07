@@ -200,25 +200,87 @@ class Game {
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
     //juega negro comodin, y selecciona azul
 
-    //Cambia el orden juega seba
+    //juega seba
     this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL")
 
     salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(0).player, this.players.getPlayerById(0).player.cartas[1]))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
     // 5 azul
 
+    //juega fede
+    this.elJuego.turno === "fede" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(4).player, this.players.getPlayerById(4).player.cartas[1]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 9
 
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(3).player, this.players.getPlayerById(3).player.cartas[2]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 7
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(2).player, this.players.getPlayerById(2).player.cartas[0]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //amarillo 7
 
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(1).player, this.players.getPlayerById(1).player.cartas[3]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 7
 
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(0).player, this.players.getPlayerById(0).player.cartas[3]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 1
 
+    this.elJuego.turno === "fede" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(4).player, this.players.getPlayerById(4).player.cartas[1]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //amarillo 1
 
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(3).player, this.players.getPlayerById(3).player.cartas[4]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 1
 
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.levantarCartaDePila(this.players.getPlayerById(2).player))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.pasarTurnoSinJugar(this.players.getPlayerById(2).player))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
 
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(1).player, this.players.getPlayerById(1).player.cartas[3]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //azul 2
 
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(0).player, this.players.getPlayerById(0).player.cartas[4]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //rojo 2
 
+    this.elJuego.turno === "fede" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(4).player, this.players.getPlayerById(4).player.cartas[1]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //rojo 9
 
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(3).player, this.players.getPlayerById(3).player.cartas[3]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //rojo 7
 
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(2).player, this.players.getPlayerById(2).player.cartas[0]))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //rojo 0
 
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL")
+    salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(1).player, this.players.getPlayerById(1).player.cartas[2],"amarillo"))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+    //negro +4
+
+    console.log(this.elJuego.turno)
+    //this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL")
+    //console.log(this.players.getPlayerById(0).player.cartas)
 
   }
 
@@ -420,7 +482,7 @@ class Game {
           if (this.elJuego.direccion) {
             this.elJuego.ronda = this.elJuego.ronda + 1;
           } else {
-            if (this.elJuego.ronda > 1) {
+            if (this.elJuego.ronda > 0) {
               this.elJuego.ronda = this.elJuego.ronda - 1;
             } else {
               this.elJuego.ronda = this.elJuego.jugadores - 1;
@@ -433,7 +495,7 @@ class Game {
           if (this.elJuego.direccion) {
             this.elJuego.ronda = this.elJuego.ronda + 1;
           } else {
-            if (this.elJuego.ronda > 1) {
+            if (this.elJuego.ronda > 0) {
               this.elJuego.ronda = this.elJuego.ronda - 1;
             } else {
               this.elJuego.ronda = this.elJuego.jugadores - 1;
