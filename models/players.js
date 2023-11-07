@@ -78,8 +78,8 @@ class Players {
         })
 
         let _cartas = this.jugadores[ix].cartas
-        _cartas.push(cartas)
-        this.jugadores[ix].cartas = _cartas
+
+        this.jugadores[ix].cartas = _cartas.concat(cartas)
         this.jugadores[ix].saidUno = false
         return {
             processed: true
@@ -106,6 +106,11 @@ class Players {
     }
 
     descartarCartaByIndex(index = 0, cartas = []) {
+
+        if(cartas.length) {
+            throw "ERROR, SE DESCARTA UN ARRAY DE CARTAS???"
+        }
+
         if (index < 0) {
             return {
                 processed: false
@@ -125,7 +130,7 @@ class Players {
         }
 
         _cartas = _cartas.filter(c => {
-            if (!cartas.includes(c)) {
+            if (c != cartas) {
                 return true
             }
             return false
@@ -229,7 +234,7 @@ class Players {
         return this.decirUnoById(ix)
     }
 
-    dejoUnoById(index = 0){
+    dijoUnoById(index = 0){
         if (index < 0) {
             return {
                 processed: false
@@ -246,7 +251,7 @@ class Players {
         }
     }
 
-    dejoUnoByNombre(nombre = ""){
+    dijoUnoByNombre(nombre = ""){
         let ix = this.getIndexPlayerByNombre(nombre)
         if (ix < 0) {
             return {
@@ -256,7 +261,7 @@ class Players {
         return this.dejoUnoById(ix)
     }
 
-    dejoUnoByJugador(jugador = new Player()){
+    dijoUnoByJugador(jugador = new Player()){
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
