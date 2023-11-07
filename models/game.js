@@ -25,6 +25,7 @@ class Game {
         * Arbitro 
     Cosas a considerar:
         * Que pasa cuando no hay mas cartas para robar
+        * No estoy ejecutando ninguna resolucion con la primer carta del descarte
     */
 
   constructor(jugadores = [], ronda = 0, espejito = 0) {
@@ -35,6 +36,7 @@ class Game {
       turno: jugadores[ronda % jugadores.length].nombre, //de quien es el turno
       levanto: false, //ya levanto
       color: "",
+      penalidad: 0,
       espejito, //si se juega con espejito o no
       finalizo: false
     };
@@ -106,8 +108,8 @@ class Game {
             this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
             this.pila = this.pila.slice(1)
             this.siguienteTurno(jugador, undefined, color)
+            penalizado = true
           }
-
           break;
         case 'paso':
           this.elJuego.levanto = false;
@@ -122,8 +124,8 @@ class Game {
           } else {
             this.players.darCartaByJugador(jugador, this.pila.slice(0, 1))
             this.pila = this.pila.slice(1)
+            penalizado = true
           }
-
           break;
         case 'uno':
           break;
@@ -156,10 +158,17 @@ class Game {
   }
 
   esUnaJugadaValida(carta) {
+    /*
+      Se puedo contrarrestar un +2 con un +4 segun esta regla
+    */
     const descarte = this.descarte.slice(0, 1);
-    if (carta.color == "negro" || carta.color == descarte[0].color || carta.valor == descarte[0].valor || (descarte.color == "negro" && this.elJuego.color == carta.color)) {
+    if (carta.color === "negro" || 
+      carta.color === descarte[0].color || 
+      carta.valor === descarte[0].valor || 
+      (descarte.color === "negro" && this.elJuego.color === carta.color)) {
       return true
     }
+    return false
   }
 
   siguienteTurno(jugador, carta, color) {
@@ -217,6 +226,7 @@ class Game {
               this.elJuego.ronda = this.elJuego.jugadores - 2;
             }
           }
+          this.elJuego.penalidad = this.elJuego.penalidad + 2
           break;
         case "+4":
           this.elJuego.color = color
@@ -229,6 +239,7 @@ class Game {
               this.elJuego.ronda = this.elJuego.jugadores - 2;
             }
           }
+          this.elJuego.penalidad = this.elJuego.penalidad + 4
           break;
         case "comodin":
           this.elJuego.color = color
@@ -290,7 +301,6 @@ class Game {
 
   descartarCarta(jugador = new Player(), carta, color) {
     let estado = 'descarto'
-
     if (!jugador.cartas.includes(carta)) {
       return {
         carta,
@@ -312,10 +322,15 @@ class Game {
     }
 
     if (this.elJuego.turno === jugador.nombre) {
-
       if (!carta && this.elJuego.levanto) {
         let estado = 'paso'
-      } else {
+        return {
+          carta,
+          jugador,
+          estado,
+          penalizado: false,
+        }
+      } else if(!this.elJuego.levanto) {
         return {
           carta,
           jugador,
