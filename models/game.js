@@ -354,6 +354,10 @@ class Game {
     salida = this.arbitrarJugada(this.descartarCarta(this.players.getPlayerById(4).player, this.players.getPlayerById(4).player.cartas[0]))
     salida.penalizado == false ? console.log("OK") : console.log("FAIL")
     //verde 7 y se queda con una carta!
+
+    salida = this.arbitrarJugada(this.decirUNO(this.players.getPlayerById(4).player))
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL")
+
     console.log(this.players.getPlayerById(4).player.cartas)
 
   }
