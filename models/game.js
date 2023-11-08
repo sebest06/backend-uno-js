@@ -1,7 +1,3 @@
-const fakegame = require("../test/faketest.js");
-const fakegame2 = require("../test/faketest2.js");
-const fakegame3 = require("../test/faketest3.js");
-const fakegame4 = require("../test/faketest4.js");
 const { Player, Players } = require("./players.js");
 
 class Carta {
@@ -32,7 +28,7 @@ class Game {
         [x] No estoy ejecutando ninguna resolucion con la primer carta del descarte
         [x] Combos de cartas
         [ ] Deberia tener que poder descartar diciendo uno, para que no se haga en dos eventos distintos
-    */
+  */
 
   constructor(jugadores = [], ronda = 0, espejito = 0) {
     this.elJuego = {
