@@ -80,7 +80,7 @@ class Players {
         let _cartas = this.jugadores[ix].cartas
 
         this.jugadores[ix].cartas = _cartas.concat(cartas)
-        this.jugadores[ix].saidUno = false
+        //this.jugadores[ix].saidUno = false
         return {
             processed: true
         }
@@ -102,7 +102,37 @@ class Players {
                 processed: false
             }
         }
+
         return this.darCartaByIndex(ix, cartas)
+    }
+
+    quitarUnoByIndex(index = 0){
+        if (index < 0) {
+            return {
+                processed: false
+            }
+        }
+
+        let ix = this.jugadores.findIndex(p => {
+            return p.id === index
+        })
+
+        
+        this.jugadores[ix].saidUno = false
+
+        return {
+            processed: true,
+        }
+    }
+
+    quitarUnoByJugador(jugador = new Player()){
+        let ix = this.getIndexByJugador(jugador)
+        if (ix < 0) {
+            return {
+                processed: false
+            }
+        }
+        return this.quitarUnoByIndex(ix)
     }
 
     descartarCartaByIndex(index = 0, cartas = []) {
@@ -208,7 +238,9 @@ class Players {
             return p.id === index
         })
 
+        
         this.jugadores[ix].saidUno = true
+
         return {
             processed: true,
         }
@@ -224,13 +256,14 @@ class Players {
         return this.decirUnoById(ix)
     }
 
-    decirUnoByJugador(jugador = new Player()){
+    decirUnoByJugador(jugador = new Player()){    
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
                 processed: false
             }
         }
+
         return this.decirUnoById(ix)
     }
 
@@ -258,7 +291,7 @@ class Players {
                 processed: false
             }
         }
-        return this.dejoUnoById(ix)
+        return this.dijoUnoById(ix)
     }
 
     dijoUnoByJugador(jugador = new Player()){
@@ -268,7 +301,7 @@ class Players {
                 processed: false
             }
         }
-        return this.dejoUnoById(ix)
+        return this.dijoUnoById(ix)
     }
 
     quitarJugadorByJugador(jugador = new Player()) {
