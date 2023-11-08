@@ -754,7 +754,178 @@ class Game {
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
     //rojo 8
 
-    console.log(this.players.getPlayerById(0).player.cartas)
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //rojo 0
+
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.levantarCartaDePila(this.players.getPlayerById(1).player)
+    );
+
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(1).player)
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(2).player,
+        this.players.getPlayerById(2).player.cartas[4]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //rojo 4
+
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.levantarCartaDePila(this.players.getPlayerById(3).player)
+    );
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(3).player,
+        this.players.getPlayerById(3).player.cartas[2],
+        "rojo"
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //comodin rojo
+
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //rojo 8
+
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.levantarCartaDePila(this.players.getPlayerById(1).player)
+    );
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(1).player)
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(2).player,
+        this.players.getPlayerById(2).player.cartas[3]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //rojo 6
+
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.levantarCartaDePila(this.players.getPlayerById(3).player)
+    );
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(3).player)
+    );
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //azul 6
+
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(1).player,
+        this.players.getPlayerById(1).player.cartas[1]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+    //azul +2
+    
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(2).player)
+    );
+
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(3).player,
+        this.players.getPlayerById(3).player.cartas[1]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //azul 8
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0],
+        "amarillo"
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+        //+4 color amarillo
+
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(1).player)
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(2).player,
+        this.players.getPlayerById(2).player.cartas[0]
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //amarillo 6
+
+    this.elJuego.turno === "geo" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.levantarCartaDePila(this.players.getPlayerById(3).player)
+    );
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(3).player,
+        this.players.getPlayerById(3).player.cartas[2],
+        "amarillo"
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+        //+4 color amarillo
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(0).player)
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+
+    console.log(this.players.getPlayerById(3).player.cartas)
 
   }
 
