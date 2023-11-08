@@ -5,6 +5,7 @@ const { socketController } = require('../sockets/controller');
 
 const { dbConnection } = require('../database/config');
 const Game = require('./game');
+const Testeador = require('../test/tester');
 
 class Server {
 
@@ -14,7 +15,8 @@ class Server {
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server);
 
-        this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true,true);
+        this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true);
+        this.test_uno_game = new Testeador()
 
         this.paths = {
             auth:       '/api/auth',
@@ -27,7 +29,7 @@ class Server {
 
 
         // Conectar a base de datos
-        this.conectarDB();
+        //this.conectarDB();
 
         // Middlewares
         this.middlewares();
