@@ -477,8 +477,8 @@ const fakegame2 = {
   ],
   descarte: [
     {
-      color: "amarillo",
-      valor: "+2",
+      color: "verde",
+      valor: "1",
     },
   ],
 };

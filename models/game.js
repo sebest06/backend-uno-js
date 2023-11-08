@@ -1,4 +1,6 @@
-const fakegame = require("./faketest.js");
+const fakegame = require("../test/faketest.js");
+const fakegame2 = require("../test/faketest2.js");
+const fakegame3 = require("../test/faketest3.js");
 const { Player, Players } = require("./players.js");
 
 class Carta {
@@ -24,6 +26,7 @@ class Game {
         * Jugador
         * Arbitro 
     Cosas a considerar:
+        [x] Si pasa sin levantar, es penalizado
         [x] Que pasa cuando no hay mas cartas para robar
         [x] No estoy ejecutando ninguna resolucion con la primer carta del descarte
         [x] Combos de cartas
@@ -33,7 +36,10 @@ class Game {
   constructor(jugadores = [], ronda = 0, espejito = 0, fake = 0) {
     if (fake) {
       console.log("=== FAKE GAME TEST ===");
-      this.crearFakeMochGame(fakegame);
+      this.crearFakeMockGame(fakegame);
+      this.crearFakeMockGame2(fakegame2)
+      this.crearFakeMockGame2(fakegame3)
+      console.log("=== END FAKE GAME TEST ===");
     } else {
       this.elJuego = {
         jugadores: jugadores.length,
@@ -102,7 +108,109 @@ class Game {
     }
   }
 
-  crearFakeMochGame(json_fake = {}) {
+  crearFakeMockGame2(json_fake = {}) {
+    //  console.log(json_fake.pila)
+    const jugadores_json = json_fake.jugadores.jugadores;
+
+    this.elJuego = {
+      jugadores: jugadores_json.length,
+      ronda: json_fake.reglas.ronda, //quien juega
+      direccion: true, //para donde sigue el juego
+      turno:
+        jugadores_json[json_fake.reglas.ronda % jugadores_json.length].nombre, //de quien es el turno
+      levanto: false, //ya levanto
+      color: "",
+      penalidad: 0,
+      espejito: json_fake.reglas.espejito, //si se juega con espejito o no
+      finalizo: false,
+    };
+
+    this.ganadores = [];
+    this.pila = json_fake.pila;
+    this.descarte = json_fake.descarte;
+
+    let list_players = [];
+    jugadores_json.forEach((p) => {
+      list_players.push(p.nombre);
+    });
+
+    this.players = new Players(list_players);
+    this.players.jugadores = json_fake.jugadores.jugadores;
+
+    let salida;
+    this.procesarPrimeraCarta();
+
+    this.elJuego.finalizo == false ? console.log("OK") : console.log("FAIL");
+
+    // Turno Seba: Hay un +2 amarillo, junto 2 cartas
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    /*salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(0).player)
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //Tengo que tener 9 cartas
+    this.players.getCartasById(0).cartas.length == 9
+      ? console.log("OK")
+      : console.log("FAIL");
+*/
+
+  this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+
+    //verde 1
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0]
+      )
+    );
+    
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+    //verde girar
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+    
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0],
+        "amarillo"
+      )
+    );
+
+    //comodin amarillo
+
+
+    this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
+    salida = this.arbitrarJugada(
+      this.pasarTurnoSinJugar(this.players.getPlayerById(1).player)
+    );
+    salida.penalizado == true ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.finalizo == false ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
+
+    salida = this.arbitrarJugada(
+      this.descartarCarta(
+        this.players.getPlayerById(0).player,
+        this.players.getPlayerById(0).player.cartas[0],
+        "amarillo"
+      )
+    );
+    salida.penalizado == false ? console.log("OK") : console.log("FAIL");
+
+    this.ganadores[0] == "seba" ? console.log("OK") : console.log("FAIL");
+
+    this.elJuego.finalizo == true ? console.log("OK") : console.log("FAIL");
+
+    
+    //console.log(this.players.getPlayerById(1).player.cartas)
+
+  }
+
+
+
+  crearFakeMockGame(json_fake = {}) {
     //  console.log(json_fake.pila)
     const jugadores_json = json_fake.jugadores.jugadores;
 
@@ -623,7 +731,7 @@ class Game {
     this.ganadores.length == 1 ? console.log("OK") : console.log("FAIL")
     this.ganadores[0] == "fede" ? console.log("OK") : console.log("FAIL")
     this.players.jugadores.length == 4 ? console.log("OK") : console.log("FAIL")
-    
+
     this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
     salida = this.arbitrarJugada(
       this.descartarCarta(
@@ -728,8 +836,8 @@ class Game {
     );
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
     this.players.getPlayerById(1).player.saidUno ? console.log("OK") : console.log("FAIL");
-      //rojo 6
-    
+    //rojo 6
+
     this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
 
     salida = this.arbitrarJugada(
@@ -860,7 +968,7 @@ class Game {
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
 
     //azul +2
-    
+
     this.elJuego.turno === "jaq" ? console.log("OK") : console.log("FAIL");
     salida = this.arbitrarJugada(
       this.pasarTurnoSinJugar(this.players.getPlayerById(2).player)
@@ -885,7 +993,7 @@ class Game {
       )
     );
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
-        //+4 color amarillo
+    //+4 color amarillo
 
     this.elJuego.turno === "ara" ? console.log("OK") : console.log("FAIL");
     salida = this.arbitrarJugada(
@@ -916,7 +1024,7 @@ class Game {
       )
     );
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
-        //+4 color amarillo
+    //+4 color amarillo
 
     this.elJuego.turno === "seba" ? console.log("OK") : console.log("FAIL");
     salida = this.arbitrarJugada(
@@ -925,7 +1033,7 @@ class Game {
     salida.penalizado == false ? console.log("OK") : console.log("FAIL");
 
 
-    console.log(this.players.getPlayerById(3).player.cartas)
+    //console.log(this.players.getPlayerById(3).player.cartas)
 
   }
 
@@ -1039,6 +1147,7 @@ class Game {
         this.elJuego.finalizo = true;
       }
     } else {
+      
       this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
       this.pila = this.pila.slice(1);
       this.siguienteTurno(jugador, undefined, color);
@@ -1119,7 +1228,6 @@ class Game {
             this.elJuego.direccion = true;
           }
           if (this.elJuego.jugadores < 3) {
-            console.log("hay solo dos jugadores");
             if (this.elJuego.direccion) {
               this.elJuego.ronda = this.elJuego.ronda + 2;
             } else {
