@@ -13,7 +13,11 @@ class Server {
         this.app  = express();
         this.port = process.env.PORT;
         this.server = require('http').createServer(this.app);
-        this.io = require('socket.io')(this.server);
+        this.io = require('socket.io')(this.server,{
+            cors: {
+                origin: "http://localhost:5173"
+              }
+        });
 
         this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true);
         this.test_uno_game = new Testeador()
