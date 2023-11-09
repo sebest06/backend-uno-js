@@ -15,6 +15,10 @@ const socketController = (socket) => {
         callback(id);
 
     });
+
+    socket.on("Hello", (p) => {
+        console.log(p)
+    })
 }
 
 module.exports = {

@@ -48,6 +48,9 @@ class Server {
 
     sockets () {
         this.io.on('connection', socketController);
+        this.io.on('HOLA', (e) => {
+            console.log("GOLA",e)
+        })
     }
 
     async conectarDB() {
