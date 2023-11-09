@@ -16,8 +16,8 @@ const socketController = (socket) => {
 
     });
 
-    socket.on("Hello", (p) => {
-        console.log(p)
+    socket.on("game", (p,id) => {
+        console.log(p,id)
     })
 }
 
