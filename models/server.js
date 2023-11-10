@@ -6,6 +6,7 @@ const { socketController } = require('../sockets/controller');
 const { dbConnection } = require('../database/config');
 const Game = require('./game');
 const Testeador = require('../test/tester');
+const Sesiones = require('./sesiones');
 
 class Server {
 
@@ -19,8 +20,10 @@ class Server {
               }
         });
 
+        this.sesiones = new Sesiones()
+
         this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true);
-        this.test_uno_game = new Testeador()
+        //this.test_uno_game = new Testeador()
 
         this.paths = {
             auth:       '/api/auth',
@@ -47,10 +50,7 @@ class Server {
     }
 
     sockets () {
-        this.io.on('connection', socketController);
-        this.io.on('HOLA', (e) => {
-            console.log("GOLA",e)
-        })
+        this.io.on('connection', (id) => socketController(id, this.sesiones));
     }
 
     async conectarDB() {
