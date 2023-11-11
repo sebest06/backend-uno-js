@@ -6,7 +6,7 @@ const { socketController } = require('../sockets/controller');
 const { dbConnection } = require('../database/config');
 const Game = require('./game');
 const Testeador = require('../test/tester');
-const Sesiones = require('./sesiones');
+const {Sesiones} = require('./sesiones');
 
 class Server {
 

@@ -1,55 +1,130 @@
+class Persona {
+  constructor(nombre, role) {
+    this.nombre = nombre;
+    this.role = role;
+  }
+}
+
 class Sesion {
-    constructor({ id, socketId, salon, password, jugadores, jugando = 0, game = null }) {
-        this.id = id;
-        this.socketId = socketId;
-        this.salon = salon;
-        this.password = password;
-        this.jugadores = jugadores;
-        this.jugando = jugando
-        this.game = game;
-        this.players = []
-    }
+  constructor(id, socketId, administrador, game = null) {
+    this.id = id; //Este Id es solo para tener un orden
+    this.socketId = socketId; //Esto es el link
+    this.players = [{ nombre: administrador, role: "admin", id: socketId }]; //Es la lista de los nombres de los jugadores
+    this.game = game; //Es el juego en curso
+  }
 }
 
 class Sesiones {
-    constructor() {
-        this.sesiones = []
+  constructor() {
+    this.sesiones = [];
+  }
+
+  /*Devuelve el SocketId de la mesa*/
+  removerSesionesBySocketId(socketId) {
+    this.sesiones = this.sesiones.filter((sesion) => {
+      return sesion.socketId != socketId;
+    });
+    const ix = this.getSesionFromSocketId(socketId);
+
+    if (ix >= 0) {
+      this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
+        return p.id != socketId;
+      });
+      return this.sesiones[ix].socketId
     }
+    return -1    
+  }
 
-    removerSesionesBySocketId(socketId) {
+  removePlayer(socketId, playerId) {
+    const ix = this.getSesionFromSocketId(socketId);
 
-        this.sesiones = this.sesiones.filter(sesion => {
-            return (sesion.socketId != socketId)
-        })
-
+    if (ix >= 0) {
+      this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
+        return p.id != playerId;
+      });
+      return true
     }
+    return -1  
+  }
 
-    addSesion(sesion = new Sesion) {
-        this.sesiones.push(new Sesion(sesion))
+  /*devuelve el indice de la sesion que contenga un usuario con socketId = socketId*/
+  getSesionFromSocketId(socketId) {
+    if (this.sesiones.length == 0) {
+      return -1;
     }
+    let ix = this.sesiones.findIndex((p) => {
+      return p.players.find((e) => {
+        return e.id == socketId;
+      });
+    });
+    return ix;
+  }
 
-    getSesiones() {
-        return this.sesiones
+  existeSesionBySocketId(socketId) {
+    let ix = this.sesiones.findIndex((p) => {
+      return p.socketId === socketId;
+    });
+    return ix;
+  }
+
+  addSesion(sesion) {
+    this.sesiones.push(new Sesion(sesion.id, sesion.socketId, sesion.nombre));
+  }
+
+  getSesiones() {
+    return this.sesiones;
+  }
+
+  getSesionById(id) {
+    let ix = this.sesiones.findIndex((p) => {
+      return p.id === id;
+    });
+    return ix;
+  }
+
+  addPlayerToSession(nombre, codigo, socketId) {
+    let socket = codigo.split("-").join("");
+    let ix = this.sesiones.findIndex((p) => {
+      return (
+        p.socketId
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .slice(0, 9)
+          .toLowerCase() === socket
+      );
+    });
+
+    if (ix >= 0) {
+      this.sesiones[ix].players.push({
+        nombre: nombre,
+        role: "",
+        id: socketId,
+      });
+      return true;
     }
+    return false;
+  }
 
-    getSesionById(id) {
-        let ix = this.sesiones.findIndex(p => {
-            return p.id === id
-        })
-        return ix
+  getMesaSocketId(codigo) {
+    let socket = codigo.split("-").join("");
+    let ix = this.sesiones.findIndex((p) => {
+      return (
+        p.socketId
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .slice(0, 9)
+          .toLowerCase() === socket
+      );
+    });
+
+    if (ix >= 0) {
+      return this.sesiones[ix].socketId;
     }
+    return -1;
+  }
 
-    setJugador(gameId, nombre, password) {
-
-        console.log(this.sesiones[this.getSesionById(gameId)],"pass", this.sesiones[this.getSesionById(gameId)].password, "pass",password)
-        if (this.sesiones[this.getSesionById(gameId)].password === password) {
-            this.sesiones[this.getSesionById(gameId)].players.push(nombre)
-            this.sesiones[this.getSesionById(gameId)].jugando += 1
-            return true
-        }
-        return false
-    }
-
+  /*setJugador(gameId, nombre, password) {
+    this.sesiones[this.getSesionById(gameId)].players.push(nombre);
+    return true;
+  }*/
 }
 
-module.exports = Sesiones;
+module.exports = { Sesiones };
