@@ -1,3 +1,5 @@
+const Game = require("./game");
+
 class Persona {
   constructor(nombre, role) {
     this.nombre = nombre;
@@ -11,6 +13,7 @@ class Sesion {
     this.socketId = socketId; //Esto es el link
     this.players = [{ nombre: administrador, role: "admin", id: socketId }]; //Es la lista de los nombres de los jugadores
     this.game = game; //Es el juego en curso
+    this.ronda = 0;
   }
 }
 
@@ -30,9 +33,9 @@ class Sesiones {
       this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
         return p.id != socketId;
       });
-      return this.sesiones[ix].socketId
+      return this.sesiones[ix].socketId;
     }
-    return -1    
+    return -1;
   }
 
   removePlayer(socketId, playerId) {
@@ -42,9 +45,9 @@ class Sesiones {
       this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
         return p.id != playerId;
       });
-      return true
+      return true;
     }
-    return -1  
+    return -1;
   }
 
   /*devuelve el indice de la sesion que contenga un usuario con socketId = socketId*/
@@ -102,6 +105,29 @@ class Sesiones {
       return true;
     }
     return false;
+  }
+
+  SesionIdByCode(code) {
+    let socket = code.split("-").join("");
+    let ix = this.sesiones.findIndex((p) => {
+      return (
+        p.socketId
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .slice(0, 9)
+          .toLowerCase() === socket
+      );
+    });
+
+    return ix
+  }
+
+  crearNewGameToSession(socketId) {
+    const ix = this.getSesionFromSocketId(socketId);
+    if (ix != -1) {
+        const jugadores = this.sesiones[ix].players;
+        this.sesiones[ix].game = new Game(jugadores,this.sesiones[ix].ronda++,true);
+    }
+    return ix;
   }
 
   getMesaSocketId(codigo) {

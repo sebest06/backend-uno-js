@@ -9,7 +9,8 @@ class Testeador {
     constructor (){
         console.log("=== FAKE GAME TEST ===");
 
-        this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true);
+        this.uno_game = new Game([{nombre: "seba", id: 32},{nombre: "ara", id: 34},{nombre: "jaq", id: 38},{nombre: "geo", id: 8},{nombre: "fede", id: 40}],0,true);
+        //this.uno_game = new Game([{nombre: "seba"},{nombre: "ara"},{nombre: "jaq"},{nombre: "geo"},{nombre: "fede"}],0,true);
         this.crearFakeMockGame(fakegame);
         this.crearFakeMockGame2(fakegame2)
         this.crearFakeMockGame2(fakegame3)

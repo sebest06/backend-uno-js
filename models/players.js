@@ -15,7 +15,7 @@ class Players {
         let ix = 0;
         lista_jugadores.forEach((jugador) => {
             const unPlayer = new Player({
-                id: ix++,
+                id: jugador.id ? jugador.id: ix++,
                 nombre: jugador.nombre,
                 cartas: [],
                 saidUno: false                
@@ -38,6 +38,28 @@ class Players {
     }
 
     getPlayerById(id = 0){
+
+        //console.log("ESTO TIENE QUE DEVOLVER UN ID de 0 a jugadores -1 ===> ", id)
+        if(id < 0 ){
+            return {
+                processed: false
+            }
+        }
+
+        /*let ix = this.jugadores.findIndex(p => {
+            return p.id === id
+        })*/
+
+        const ix = id
+
+        return {
+            processed: true,
+            player: this.jugadores[ix]
+        }
+    }
+
+    getPlayerByIdentification(id = 0){
+
         if(id < 0 ){
             return {
                 processed: false
@@ -48,11 +70,15 @@ class Players {
             return p.id === id
         })
 
+        //const ix = id
+
         return {
             processed: true,
             player: this.jugadores[ix]
         }
     }
+
+
     getPlayerByNombre(nombre = ""){
         let ix = this.getIndexPlayerByNombre(nombre);
         if(ix<0){
@@ -67,15 +93,18 @@ class Players {
     }
 
     darCartaByIndex(index = 0, cartas = []) {
+
         if (index < 0) {
             return {
                 processed: false
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        /*const ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+        
+        const ix = index
 
         let _cartas = this.jugadores[ix].cartas
 
@@ -113,9 +142,11 @@ class Players {
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        /*let ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+
+        const ix = index
 
         
         this.jugadores[ix].saidUno = false
@@ -147,9 +178,13 @@ class Players {
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        //console.log("idnex:",index)
+
+        /*let ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+
+        const ix = index;
 
         let _cartas = this.jugadores[ix].cartas
 
@@ -191,15 +226,18 @@ class Players {
     }
 
     getCartasById(index = 0){
+
         if (index < 0) {
             return {
                 processed: false
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        /*let ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+
+        const ix = index
 
         //console.log("index:", index, "QUE ES ESTO?:", this.jugadores)
         let cartas = this.jugadores[ix].cartas
@@ -234,9 +272,11 @@ class Players {
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        /*let ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+
+        const ix = index
 
         
         this.jugadores[ix].saidUno = true
@@ -274,9 +314,11 @@ class Players {
             }
         }
 
-        let ix = this.jugadores.findIndex(p => {
+        /*let ix = this.jugadores.findIndex(p => {
             return p.id === index
-        })
+        })*/
+
+        const ix = index
 
         return {
             processed: true,
