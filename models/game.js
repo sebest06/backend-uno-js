@@ -354,13 +354,19 @@ class Game {
 
   levantarCartaDePila(jugador = new Player(), n = 1) {
     if (this.pila.length <= n) {
-      this.pila.push(this.descarte.slice(1));
+      const descartes = this.descarte.slice(1)
+      this.pila = this.pila.concat(descartes)
       this.descarte = this.descarte.slice(0, 1);
       this.pila = this.mezclarBarajas(this.pila);
     }
 
-    let carta = this.pila.slice(0, n);
-    let estado = "levanto";
+    if(this.pila.length < n)
+    {
+      this.elJuego.finalizo = true
+    }
+
+    const carta = this.pila.slice(0, n);
+    const estado = "levanto";
     if (
       !this.elJuego.levanto &&
       this.elJuego.turno === jugador.nombre &&
