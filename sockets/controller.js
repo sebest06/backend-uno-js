@@ -101,7 +101,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
           cartas: p.cartas,
           saidUno: p.saidUno,
           nombre: p.nombre,
-          turno: sesiones.sesiones[ix].game.elJuego.turno,
+          turno: {
+            nombre: sesiones.sesiones[ix].game.elJuego.turno,
+            turno:
+              sesiones.sesiones[ix].game.elJuego.ronda %
+              sesiones.sesiones[ix].game.players.jugadores.length,
+          },
           descarte: sesiones.sesiones[ix].game.descarte,
           players: participantes,
           ganadores: sesiones.sesiones[ix].game.ganadores,
@@ -122,15 +127,13 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         ix
       ].game.players.getPlayerByIdentification(socket.id);
       if (processed) {
-       
-          sesiones.sesiones[ix].game.arbitrarJugada(
-            sesiones.sesiones[ix].game.descartarCarta(
-              player,
-              player.cartas[payload.cart_index],
-              payload.color
-            )
+        sesiones.sesiones[ix].game.arbitrarJugada(
+          sesiones.sesiones[ix].game.descartarCarta(
+            player,
+            player.cartas[payload.cart_index],
+            payload.color
           )
-
+        );
 
         let participantes = [];
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
@@ -148,7 +151,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             cartas: p.cartas,
             saidUno: p.saidUno,
             nombre: p.nombre,
-            turno: sesiones.sesiones[ix].game.elJuego.turno,
+            turno: {
+              nombre: sesiones.sesiones[ix].game.elJuego.turno,
+              turno:
+                sesiones.sesiones[ix].game.elJuego.ronda %
+                sesiones.sesiones[ix].game.players.jugadores.length,
+            },
             descarte: sesiones.sesiones[ix].game.descarte,
             players: participantes,
             ganadores: sesiones.sesiones[ix].game.ganadores,
@@ -171,12 +179,9 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         ix
       ].game.players.getPlayerByIdentification(socket.id);
       if (processed) {
-
-          sesiones.sesiones[ix].game.arbitrarJugada(
-            sesiones.sesiones[ix].game.levantarCartaDePila(
-              player
-            )
-          )
+        sesiones.sesiones[ix].game.arbitrarJugada(
+          sesiones.sesiones[ix].game.levantarCartaDePila(player)
+        );
 
         let participantes = [];
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
@@ -194,7 +199,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             cartas: p.cartas,
             saidUno: p.saidUno,
             nombre: p.nombre,
-            turno: sesiones.sesiones[ix].game.elJuego.turno,
+            turno: {
+              nombre: sesiones.sesiones[ix].game.elJuego.turno,
+              turno:
+                sesiones.sesiones[ix].game.elJuego.ronda %
+                sesiones.sesiones[ix].game.players.jugadores.length,
+            },
             descarte: sesiones.sesiones[ix].game.descarte,
             players: participantes,
             ganadores: sesiones.sesiones[ix].game.ganadores,
@@ -217,12 +227,9 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         ix
       ].game.players.getPlayerByIdentification(socket.id);
       if (processed) {
-
-          sesiones.sesiones[ix].game.arbitrarJugada(
-            sesiones.sesiones[ix].game.pasarTurnoSinJugar(
-              player
-            )
-          )
+        sesiones.sesiones[ix].game.arbitrarJugada(
+          sesiones.sesiones[ix].game.pasarTurnoSinJugar(player)
+        );
 
         let participantes = [];
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
@@ -240,7 +247,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             cartas: p.cartas,
             saidUno: p.saidUno,
             nombre: p.nombre,
-            turno: sesiones.sesiones[ix].game.elJuego.turno,
+            turno: {
+              nombre: sesiones.sesiones[ix].game.elJuego.turno,
+              turno:
+                sesiones.sesiones[ix].game.elJuego.ronda %
+                sesiones.sesiones[ix].game.players.jugadores.length,
+            },
             descarte: sesiones.sesiones[ix].game.descarte,
             players: participantes,
             ganadores: sesiones.sesiones[ix].game.ganadores,
@@ -263,12 +275,9 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         ix
       ].game.players.getPlayerByIdentification(socket.id);
       if (processed) {
-
-          sesiones.sesiones[ix].game.arbitrarJugada(
-            sesiones.sesiones[ix].game.decirUNO(
-              player
-            )
-          )
+        sesiones.sesiones[ix].game.arbitrarJugada(
+          sesiones.sesiones[ix].game.decirUNO(player)
+        );
 
         let participantes = [];
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
@@ -286,7 +295,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             cartas: p.cartas,
             saidUno: p.saidUno,
             nombre: p.nombre,
-            turno: sesiones.sesiones[ix].game.elJuego.turno,
+            turno: {
+              nombre: sesiones.sesiones[ix].game.elJuego.turno,
+              turno:
+                sesiones.sesiones[ix].game.elJuego.ronda %
+                sesiones.sesiones[ix].game.players.jugadores.length,
+            },
             descarte: sesiones.sesiones[ix].game.descarte,
             players: participantes,
             ganadores: sesiones.sesiones[ix].game.ganadores,
@@ -300,8 +314,6 @@ const socketController = (socket, sesiones = new Sesiones()) => {
       }
     }
   });
-  
-
 };
 
 module.exports = {
