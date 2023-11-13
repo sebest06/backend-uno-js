@@ -68,21 +68,12 @@ class Game {
 
     switch (descarte.valor) {
       case "girar":
-        if (this.elJuego.direccion) {
-          this.elJuego.direccion = false;
-        } else {
-          this.elJuego.direccion = true;
-        }
+        this.elJuego.direccion = false;
+        this.elJuego.ronda = this.elJuego.jugadores - 1;
         break;
       case "bloquear":
         if (this.elJuego.direccion) {
           this.elJuego.ronda = this.elJuego.ronda + 1;
-        } else {
-          if (this.elJuego.ronda > 1) {
-            this.elJuego.ronda = this.elJuego.ronda - 1;
-          } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 1;
-          }
         }
         break;
       case "+2":
@@ -98,23 +89,38 @@ class Game {
   }
 
   arbitrarJugada({ estado, jugador, carta, penalizado, reportado, color }) {
-    if (!penalizado) {
-      switch (estado) {
-        case "levanto":
-          this.elJuego.levanto = true;
-          this.players.darCartaByJugador(jugador, carta);
-          this.players.quitarUnoByJugador(jugador);
-          this.pila = this.pila.slice(carta.length);
-          break;
-        case "descarto":
-          this.elJuego.levanto = false;
-          if (this.esUnaJugadaValida(carta)) {
-            this.descarte.unshift(carta);
-            this.players.descartarCartaByJugador(jugador, carta);
-            this.siguienteTurno(jugador, carta ? carta : undefined, color);
-          } else {
-            this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
-            this.pila = this.pila.slice(1);
+    if (!this.elJuego.finalizo) {
+      if (!penalizado) {
+        switch (estado) {
+          case "levanto":
+            this.elJuego.levanto = true;
+            this.players.darCartaByJugador(jugador, carta);
+            this.players.quitarUnoByJugador(jugador);
+            this.pila = this.pila.slice(carta.length);
+            break;
+          case "descarto":
+            this.elJuego.levanto = false;
+            if (this.esUnaJugadaValida(carta)) {
+              this.descarte.unshift(carta);
+              this.players.descartarCartaByJugador(jugador, carta);
+              this.siguienteTurno(jugador, carta ? carta : undefined, color);
+            } else {
+              this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
+              this.pila = this.pila.slice(1);
+              if (this.elJuego.penalidad) {
+                this.players.darCartaByJugador(
+                  jugador,
+                  this.pila.slice(0, this.elJuego.penalidad)
+                );
+                this.pila = this.pila.slice(this.elJuego.penalidad);
+                this.elJuego.penalidad = 0;
+              }
+              this.siguienteTurno(jugador, undefined, color);
+              penalizado = true;
+            }
+            break;
+          case "paso":
+            this.elJuego.levanto = false;
             if (this.elJuego.penalidad) {
               this.players.darCartaByJugador(
                 jugador,
@@ -124,75 +130,64 @@ class Game {
               this.elJuego.penalidad = 0;
             }
             this.siguienteTurno(jugador, undefined, color);
-            penalizado = true;
-          }
-          break;
-        case "paso":
-          this.elJuego.levanto = false;
-          if (this.elJuego.penalidad) {
-            this.players.darCartaByJugador(
-              jugador,
-              this.pila.slice(0, this.elJuego.penalidad)
-            );
-            this.pila = this.pila.slice(this.elJuego.penalidad);
-            this.elJuego.penalidad = 0;
-          }
-          this.siguienteTurno(jugador, undefined, color);
-          break;
-        case "espejito":
-          this.elJuego.levanto = false;
-          if (this.esUnaJugadaValida(carta)) {
-            this.descarte.unshift(carta);
-            this.players.descartarCartaByJugador(jugador, carta);
-            this.siguienteTurno(jugador, carta ? carta : undefined, color);
-          } else {
-            this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
-            this.pila = this.pila.slice(1);
-            penalizado = true;
-          }
-          break;
-        case "uno":
-          this.players.decirUnoByJugador(jugador);
-          break;
-        case "reporto":
-          if (reportado) {
-            this.players.darCartaByJugador(reportado, this.pila.slice(0, 2));
-            this.pila = this.pila.slice(2);
-            penalizado = false;
-          }
-          break;
-        default:
+            break;
+          case "espejito":
+            this.elJuego.levanto = false;
+            if (this.esUnaJugadaValida(carta)) {
+              this.descarte.unshift(carta);
+              this.players.descartarCartaByJugador(jugador, carta);
+              this.siguienteTurno(jugador, carta ? carta : undefined, color);
+            } else {
+              this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
+              this.pila = this.pila.slice(1);
+              penalizado = true;
+            }
+            break;
+          case "uno":
+            this.players.decirUnoByJugador(jugador);
+            break;
+          case "reporto":
+            if (reportado) {
+              this.players.darCartaByJugador(reportado, this.pila.slice(0, 2));
+              this.pila = this.pila.slice(2);
+              penalizado = false;
+            }
+            break;
+          default:
+        }
+
+        if (this.players.getCartasByJugador(jugador).cartas.length == 0) {
+          this.ganadores.push({ nombre: jugador.nombre, id: jugador.id });
+          this.players.quitarJugadorByJugador(jugador);
+          this.elJuego.jugadores = this.elJuego.jugadores - 1;
+        }
+        if (this.elJuego.jugadores == 1) {
+          this.elJuego.finalizo = true;
+        }
+      } else {
+        this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
+        this.pila = this.pila.slice(1);
+        this.siguienteTurno(jugador, undefined, color);
+        if (this.elJuego.penalidad) {
+          this.players.darCartaByJugador(
+            jugador,
+            this.pila.slice(0, this.elJuego.penalidad)
+          );
+          this.pila = this.pila.slice(this.elJuego.penalidad);
+          this.elJuego.penalidad = 0;
+        }
       }
 
-      if (this.players.getCartasByJugador(jugador).cartas.length == 0) {
-        this.ganadores.push(jugador.nombre);
-        this.players.quitarJugadorByJugador(jugador);
-        this.elJuego.jugadores = this.elJuego.jugadores - 1;
-      }
-      if (this.elJuego.jugadores == 1) {
-        this.elJuego.finalizo = true;
-      }
+      return {
+        carta,
+        jugador,
+        estado,
+        penalizado,
+        reportado,
+      };
     } else {
-      this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
-      this.pila = this.pila.slice(1);
-      this.siguienteTurno(jugador, undefined, color);
-      if (this.elJuego.penalidad) {
-        this.players.darCartaByJugador(
-          jugador,
-          this.pila.slice(0, this.elJuego.penalidad)
-        );
-        this.pila = this.pila.slice(this.elJuego.penalidad);
-        this.elJuego.penalidad = 0;
-      }
+      null
     }
-
-    return {
-      carta,
-      jugador,
-      estado,
-      penalizado,
-      reportado,
-    };
   }
 
   esUnaJugadaValida(carta) {
@@ -242,7 +237,7 @@ class Game {
             if (this.elJuego.ronda > 1) {
               this.elJuego.ronda = this.elJuego.ronda - 2;
             } else {
-              this.elJuego.ronda = this.elJuego.jugadores - 2;
+              this.elJuego.ronda = this.elJuego.jugadores - 2 + this.elJuego.ronda;
             }
           }
           break;
@@ -252,14 +247,14 @@ class Game {
           } else {
             this.elJuego.direccion = true;
           }
-          if (this.elJuego.jugadores < 3) {
+          if (this.elJuego.jugadores == 2) {
             if (this.elJuego.direccion) {
               this.elJuego.ronda = this.elJuego.ronda + 2;
             } else {
               if (this.elJuego.ronda > 1) {
                 this.elJuego.ronda = this.elJuego.ronda - 2;
               } else {
-                this.elJuego.ronda = this.elJuego.jugadores - 2;
+                this.elJuego.ronda = this.elJuego.jugadores - 2 + this.elJuego.ronda;
               }
             }
           } else {
