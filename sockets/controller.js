@@ -83,6 +83,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             const pay = {
                 socketId: p.id,
                 cartas: p.cartas,
+                comodin: sesiones.sesiones[ix].game.elJuego.color,
                 saidUno: p.saidUno,
                 nombre: p.nombre,
                 jugando: !sesiones.sesiones[ix].game.elJuego.finalizo,
@@ -107,6 +108,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             const pay = {
                 socketId: p.id,
                 cartas: [],
+                comodin: "",
                 saidUno: true,
                 nombre: p.nombre,
                 jugando: false,

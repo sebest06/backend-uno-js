@@ -81,6 +81,7 @@ class Game {
         break;
       case "+4":
         this.elJuego.penalidad = this.elJuego.penalidad + 4;
+        this.elJuego.color = "rojo";
         break;
       case "comodin":
         this.elJuego.color = "rojo";
