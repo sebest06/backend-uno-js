@@ -16,7 +16,7 @@ class Server {
         this.server = require('http').createServer(this.app);
         this.io = require('socket.io')(this.server,{
             cors: {
-                origin: "http://localhost:5173"
+                origin: "*"
               }
         });
 
@@ -42,7 +42,7 @@ class Server {
         this.middlewares();
 
         // Rutas de mi aplicación
-        this.routes();
+        //this.routes();
 
         //config sockets
         this.sockets();
