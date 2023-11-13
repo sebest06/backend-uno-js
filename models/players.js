@@ -107,6 +107,7 @@ class Players {
         const ix = index
 
         let _cartas = this.jugadores[ix].cartas
+        this.jugadores[ix].saidUno = false
 
         this.jugadores[ix].cartas = _cartas.concat(cartas)
         //this.jugadores[ix].saidUno = false

@@ -86,6 +86,16 @@ class Game {
         this.elJuego.color = "rojo";
         break;
     }
+
+    const { processed, player } = this.players.getPlayerById(
+      this.elJuego.ronda % this.elJuego.jugadores
+    );
+
+    if (!processed) {
+      throw "ERROR";
+    }
+    this.elJuego.turno = player.nombre;
+
   }
 
   arbitrarJugada({ estado, jugador, carta, penalizado, reportado, color }) {
