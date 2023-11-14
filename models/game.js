@@ -52,9 +52,10 @@ class Game {
     this.pila = this.crearMBarajasCartas(Math.floor(jugadores.length / 4) + 1);
     this.pila = this.mezclarBarajas(this.pila);
 
+    const cartas_por_jugador = 7
     jugadores.forEach((jugador, ix) => {
-      this.players.darCartaByIndex(ix, this.pila.slice(0, 7));
-      this.pila = this.pila.slice(7);
+      this.players.darCartaByIndex(ix, this.pila.slice(0, cartas_por_jugador));
+      this.pila = this.pila.slice(cartas_por_jugador);
     });
 
     this.descarte = this.pila.slice(0, 1);
@@ -69,12 +70,14 @@ class Game {
     switch (descarte.valor) {
       case "girar":
         this.elJuego.direccion = false;
-        this.elJuego.ronda = this.elJuego.jugadores - 1;
+        if (this.elJuego.ronda > 0) {
+          this.elJuego.ronda = this.elJuego.ronda - 1
+        } else {
+          this.elJuego.ronda = this.elJuego.jugadores - 1;
+        }
         break;
       case "bloquear":
-        if (this.elJuego.direccion) {
-          this.elJuego.ronda = this.elJuego.ronda + 1;
-        }
+        this.elJuego.ronda = this.elJuego.ronda + 1;
         break;
       case "+2":
         this.elJuego.penalidad = this.elJuego.penalidad + 2;
@@ -360,8 +363,7 @@ class Game {
       this.pila = this.mezclarBarajas(this.pila);
     }
 
-    if(this.pila.length < n)
-    {
+    if (this.pila.length < n) {
       this.elJuego.finalizo = true
     }
 
