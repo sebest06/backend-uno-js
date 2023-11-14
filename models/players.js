@@ -15,10 +15,10 @@ class Players {
         let ix = 0;
         lista_jugadores.forEach((jugador) => {
             const unPlayer = new Player({
-                id: jugador.id ? jugador.id: ix++,
+                id: jugador.id ? jugador.id : ix++,
                 nombre: jugador.nombre,
                 cartas: [],
-                saidUno: false                
+                saidUno: false
             });
             this.jugadores.push(unPlayer);
         })
@@ -37,10 +37,10 @@ class Players {
         return ix;
     }
 
-    getPlayerById(id = 0){
+    getPlayerById(id = 0) {
 
         //console.log("ESTO TIENE QUE DEVOLVER UN ID de 0 a jugadores -1 ===> ", id)
-        if(id < 0 ){
+        if (id < 0) {
             return {
                 processed: false
             }
@@ -58,9 +58,9 @@ class Players {
         }
     }
 
-    getPlayerByIdentification(id = 0){
+    getPlayerByIdentification(id = 0) {
 
-        if(id < 0 ){
+        if (id < 0) {
             return {
                 processed: false
             }
@@ -69,6 +69,12 @@ class Players {
         let ix = this.jugadores.findIndex(p => {
             return p.id === id
         })
+
+        if (ix == -1) {
+            return {
+                processed: false
+            }
+        }
 
         //const ix = id
 
@@ -79,9 +85,9 @@ class Players {
     }
 
 
-    getPlayerByNombre(nombre = ""){
+    getPlayerByNombre(nombre = "") {
         let ix = this.getIndexPlayerByNombre(nombre);
-        if(ix<0){
+        if (ix < 0) {
             return {
                 processed: false
             }
@@ -103,7 +109,7 @@ class Players {
         /*const ix = this.jugadores.findIndex(p => {
             return p.id === index
         })*/
-        
+
         const ix = index
 
         let _cartas = this.jugadores[ix].cartas
@@ -136,7 +142,7 @@ class Players {
         return this.darCartaByIndex(ix, cartas)
     }
 
-    quitarUnoByIndex(index = 0){
+    quitarUnoByIndex(index = 0) {
         if (index < 0) {
             return {
                 processed: false
@@ -149,7 +155,7 @@ class Players {
 
         const ix = index
 
-        
+
         this.jugadores[ix].saidUno = false
 
         return {
@@ -157,7 +163,7 @@ class Players {
         }
     }
 
-    quitarUnoByJugador(jugador = new Player()){
+    quitarUnoByJugador(jugador = new Player()) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -169,7 +175,7 @@ class Players {
 
     descartarCartaByIndex(index = 0, cartas = []) {
 
-        if(cartas.length) {
+        if (cartas.length) {
             throw "ERROR, SE DESCARTA UN ARRAY DE CARTAS???"
         }
 
@@ -226,7 +232,7 @@ class Players {
         return this.descartarCartaByIndex(ix, cartas)
     }
 
-    getCartasById(index = 0){
+    getCartasById(index = 0) {
 
         if (index < 0) {
             return {
@@ -247,7 +253,7 @@ class Players {
             cartas
         }
     }
-    getCartasByNombre(nombre = ""){
+    getCartasByNombre(nombre = "") {
         let ix = this.getIndexPlayerByNombre(nombre)
         if (ix < 0) {
             return {
@@ -256,7 +262,7 @@ class Players {
         }
         return this.getCartasById(ix)
     }
-    getCartasByJugador(jugador = new Player()){
+    getCartasByJugador(jugador = new Player()) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -266,7 +272,7 @@ class Players {
         return this.getCartasById(ix)
     }
 
-    decirUnoById(index = 0){
+    decirUnoById(index = 0) {
         if (index < 0) {
             return {
                 processed: false
@@ -279,7 +285,7 @@ class Players {
 
         const ix = index
 
-        
+
         this.jugadores[ix].saidUno = true
 
         return {
@@ -287,7 +293,7 @@ class Players {
         }
     }
 
-    decirUnoByNombre(nombre = ""){
+    decirUnoByNombre(nombre = "") {
         let ix = this.getIndexPlayerByNombre(nombre)
         if (ix < 0) {
             return {
@@ -297,7 +303,7 @@ class Players {
         return this.decirUnoById(ix)
     }
 
-    decirUnoByJugador(jugador = new Player()){    
+    decirUnoByJugador(jugador = new Player()) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -308,7 +314,7 @@ class Players {
         return this.decirUnoById(ix)
     }
 
-    dijoUnoById(index = 0){
+    dijoUnoById(index = 0) {
         if (index < 0) {
             return {
                 processed: false
@@ -327,7 +333,7 @@ class Players {
         }
     }
 
-    dijoUnoByNombre(nombre = ""){
+    dijoUnoByNombre(nombre = "") {
         let ix = this.getIndexPlayerByNombre(nombre)
         if (ix < 0) {
             return {
@@ -337,7 +343,7 @@ class Players {
         return this.dijoUnoById(ix)
     }
 
-    dijoUnoByJugador(jugador = new Player()){
+    dijoUnoByJugador(jugador = new Player()) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -355,8 +361,8 @@ class Players {
                 processed: false
             }
         }
-        this.jugadores = this.jugadores.filter ((j,index) => {
-            if(index != ix) {
+        this.jugadores = this.jugadores.filter((j, index) => {
+            if (index != ix) {
                 return true
             } else {
                 return false

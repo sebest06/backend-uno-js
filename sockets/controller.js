@@ -233,12 +233,13 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 ix
             ].game.players.getPlayerByIdentification(socket.id);
 
-            const reportado = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerById(payload.jugador)
             if (processed) {
+                const reportado = sesiones.sesiones[
+                    ix
+                ].game.players.getPlayerById(payload.jugador)
+
                 sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.reportarJugadorConUnaCarta(player,reportado.player)
+                    sesiones.sesiones[ix].game.reportarJugadorConUnaCarta(player, reportado.player)
                 );
 
                 updateMesaByIx(ix)
