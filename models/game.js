@@ -174,6 +174,22 @@ class Game {
           this.ganadores.push({ nombre: jugador.nombre, id: jugador.id });
           this.players.quitarJugadorByJugador(jugador);
           this.elJuego.jugadores = this.elJuego.jugadores - 1;
+        
+          if (this.elJuego.ronda > 0) {
+            this.elJuego.ronda = this.elJuego.ronda - 1;
+          }else {
+            if(this.elJuego.direccion) {
+              this.elJuego.ronda = 0
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores
+            }
+          }
+
+          const result = this.players.getPlayerById(
+            this.elJuego.ronda % this.elJuego.jugadores
+          );
+          this.elJuego.turno = result.player.nombre;
+
         }
         if (this.elJuego.jugadores == 1) {
           this.elJuego.finalizo = true;
