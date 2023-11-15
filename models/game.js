@@ -181,17 +181,19 @@ class Game {
       } else {
         this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
         this.pila = this.pila.slice(1);
-        if (this.elJuego.ronda == this.players.getIndexByJugador(jugador)) {
+        if ((this.elJuego.ronda % this.elJuego.jugadores) == this.players.getIndexByJugador(jugador)) {
           this.siguienteTurno(jugador, undefined, color);
-          if (this.elJuego.penalidad) {
-            this.players.darCartaByJugador(
-              jugador,
-              this.pila.slice(0, this.elJuego.penalidad)
-            );
-            this.pila = this.pila.slice(this.elJuego.penalidad);
-            this.elJuego.penalidad = 0;
-          }
+          this.elJuego.levanto = false
         }
+        if (this.elJuego.penalidad) {
+          this.players.darCartaByJugador(
+            jugador,
+            this.pila.slice(0, this.elJuego.penalidad)
+          );
+          this.pila = this.pila.slice(this.elJuego.penalidad);
+          this.elJuego.penalidad = 0;
+        }
+
       }
 
       return {
@@ -338,19 +340,6 @@ class Game {
       this.elJuego.ronda % this.elJuego.jugadores
     );
 
-    /*console.log("players", this.players)
-    const { processed, player } =
-      this.players.jugadores[this.elJuego.ronda % this.elJuego.jugadores];
-
-    console.log(
-      "pasando turno",
-      this.elJuego.ronda,
-      this.elJuego.jugadores,
-      this.elJuego.ronda % this.elJuego.jugadores
-    );*/
-
-    //console.log(player)
-
     if (!processed) {
       throw "ERROR";
     }
@@ -371,6 +360,7 @@ class Game {
 
     const carta = this.pila.slice(0, n);
     const estado = "levanto";
+
     if (
       !this.elJuego.levanto &&
       this.elJuego.turno === jugador.nombre &&
@@ -519,7 +509,6 @@ class Game {
   crearMBarajasCartas(mBarajas) {
     let baraja = [];
     for (let m = 0; m < mBarajas; m++) {
-      //console.log((jugadores.length / 4) + 1);
       let color = "rojo";
       for (let i = 0; i < 10; i++) {
         baraja.push(
