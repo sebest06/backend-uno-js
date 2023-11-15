@@ -181,14 +181,16 @@ class Game {
       } else {
         this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
         this.pila = this.pila.slice(1);
-        this.siguienteTurno(jugador, undefined, color);
-        if (this.elJuego.penalidad) {
-          this.players.darCartaByJugador(
-            jugador,
-            this.pila.slice(0, this.elJuego.penalidad)
-          );
-          this.pila = this.pila.slice(this.elJuego.penalidad);
-          this.elJuego.penalidad = 0;
+        if (this.elJuego.ronda == this.players.getIndexByJugador(jugador)) {
+          this.siguienteTurno(jugador, undefined, color);
+          if (this.elJuego.penalidad) {
+            this.players.darCartaByJugador(
+              jugador,
+              this.pila.slice(0, this.elJuego.penalidad)
+            );
+            this.pila = this.pila.slice(this.elJuego.penalidad);
+            this.elJuego.penalidad = 0;
+          }
         }
       }
 
