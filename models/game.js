@@ -509,7 +509,7 @@ class Game {
       return {
         jugador,
         estado,
-        penalizado: false,
+        penalizado: true,
       };
     }
   }
