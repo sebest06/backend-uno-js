@@ -21,6 +21,9 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     socket.on("disconnect", () => {
         const MesaSockeId = sesiones.removerSesionesBySocketId(socket.id);
         updateMesaAdmin(MesaSockeId);
+        if (MesaSockeId != -1) {
+            updateMesaByIx(sesiones.getSesionFromSocketId(MesaSockeId))
+        }
     });
 
     socket.on("addMesa", (payload) => {
@@ -75,6 +78,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 nombre: j.nombre,
                 cartas: j.cartas.length,
                 saidUno: j.saidUno,
+                strikes: j.strikes,
             };
             participantes.push(dato);
         });
@@ -129,15 +133,41 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             }
         });
 
+        sesiones.sesiones[ix].game.perdedores.forEach((p) => {
+            const pay = {
+                socketId: p.id,
+                cartas: [],
+                comodin: "",
+                saidUno: true,
+                nombre: p.nombre,
+                jugando: false,
+                turno: {
+                    nombre: sesiones.sesiones[ix].game.elJuego.turno,
+                    turno:
+                        sesiones.sesiones[ix].game.elJuego.ronda %
+                        sesiones.sesiones[ix].game.players.jugadores.length,
+                },
+                descarte: sesiones.sesiones[ix].game.descarte,
+                players: participantes,
+                ganadores: sesiones.sesiones[ix].game.ganadores,
+            };
+            if (p.id != socket.id) {
+                socket.to(p.id).emit("gameStatus", pay);
+            } else {
+                socket.emit("gameStatus", pay);
+            }
+        });
+
     }
 
     socket.on("kickPlayer", (payload) => {
         if (socket.id != payload.playerSocket) {
             const ix = sesiones.existeSesionBySocketId(socket.id);
             if (ix != -1) {
-                if (sesiones.removePlayer(socket.id, payload.playerSocket)) {
+                if (sesiones.removePlayer(socket.id, payload.playerSocket) != -1) {
                     updateMesa(socket.id);
                     socket.to(payload.playerSocket).emit("disconnected");
+                    updateMesaByIx(ix)
                 }
             }
         }
@@ -148,7 +178,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     };*/
 
     socket.on("startGame", (payload) => {
-        const ix = sesiones.crearNewGameToSession(socket.id);
+        const ix = sesiones.crearNewGameToSession(socket.id, (payload&&payload.hasOwnProperty('strikes'))?payload.strikes:3);
         if (ix != -1) {
             updateMesaByIx(ix)
         }

@@ -32,7 +32,7 @@ class Game {
         [ ] Tengo que quitar la bandera de que dijo uno, cuando el jugador es penalizado por jugar mal
   */
 
-  constructor(jugadores = [], ronda = 0, espejito = 0) {
+  constructor(jugadores = [], ronda = 0, espejito = 0, strikes = 0) {
     this.elJuego = {
       jugadores: jugadores.length,
       ronda, //quien juega
@@ -43,10 +43,12 @@ class Game {
       penalidad: 0,
       espejito, //si se juega con espejito o no
       finalizo: false,
+      strikes: strikes
     };
 
     this.players = new Players(jugadores);
     this.ganadores = [];
+    this.perdedores = []
     this.pila = [];
 
     this.pila = this.crearMBarajasCartas(Math.floor(jugadores.length / 4) + 1);
@@ -62,6 +64,35 @@ class Game {
     this.pila = this.pila.slice(1);
 
     this.procesarPrimeraCarta();
+  }
+
+  kickPlayer(jugador) {
+    const _cartasMano = this.players.getCartasByJugador(jugador).cartas
+    this.pila = this.pila.concat(_cartasMano)
+    this.pila = this.mezclarBarajas(this.pila);
+    const position = this.players.getIndexByJugador(jugador)
+    this.players.quitarJugadorByJugador(jugador);
+    this.elJuego.ronda = this.elJuego.ronda % this.elJuego.jugadores
+    this.elJuego.jugadores = this.elJuego.jugadores - 1;
+
+    if (this.elJuego.direccion) {
+      if (position < this.elJuego.ronda) {
+        if (this.elJuego.ronda > 0) {
+          this.elJuego.ronda = this.elJuego.ronda - 1
+        } else {
+          this.elJuego.ronda = this.elJuego.jugadores - 1
+        }
+      }
+    } else {
+      if (position <= this.elJuego.ronda) {
+        this.elJuego.ronda = this.elJuego.ronda - 1
+      }
+    }
+
+    const result = this.players.getPlayerById(
+      this.elJuego.ronda % this.elJuego.jugadores
+    );
+    this.elJuego.turno = result.player.nombre;
   }
 
   procesarPrimeraCarta() {
@@ -171,14 +202,14 @@ class Game {
         }
 
         if (this.players.getCartasByJugador(jugador).cartas.length == 0) {
-          this.ganadores.push({ nombre: jugador.nombre, id: jugador.id });
+          this.ganadores.push({ nombre: jugador.nombre, id: jugador.id, strikes: jugador.strikes });
           this.players.quitarJugadorByJugador(jugador);
           this.elJuego.jugadores = this.elJuego.jugadores - 1;
-        
+
           if (this.elJuego.ronda > 0) {
             this.elJuego.ronda = this.elJuego.ronda - 1;
-          }else {
-            if(this.elJuego.direccion) {
+          } else {
+            if (this.elJuego.direccion) {
               this.elJuego.ronda = 0
             } else {
               this.elJuego.ronda = this.elJuego.jugadores
@@ -195,6 +226,7 @@ class Game {
           this.elJuego.finalizo = true;
         }
       } else {
+
         this.players.darCartaByJugador(jugador, this.pila.slice(0, 1));
         this.pila = this.pila.slice(1);
         if ((this.elJuego.ronda % this.elJuego.jugadores) == this.players.getIndexByJugador(jugador)) {
@@ -208,6 +240,16 @@ class Game {
           );
           this.pila = this.pila.slice(this.elJuego.penalidad);
           this.elJuego.penalidad = 0;
+        }
+
+        if(this.elJuego.strikes != 0){
+          jugador.strikes += 1
+          //console.log(jugador.nombre, jugador.strikes)
+          if(jugador.strikes > this.elJuego.strikes){
+            this.perdedores.push({ nombre: jugador.nombre, id: jugador.id });
+            this.kickPlayer(jugador)
+
+          }
         }
 
       }

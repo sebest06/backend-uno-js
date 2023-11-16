@@ -4,6 +4,7 @@ class Player {
         this.saidUno = false;
         this.cartas = cartas;
         this.id = id;
+        this.strikes = 0;
     }
 }
 

@@ -27,10 +27,21 @@ class Sesiones {
     this.sesiones = this.sesiones.filter((sesion) => {
       return sesion.socketId != socketId;
     });
+
     const ix = this.getSesionFromSocketId(socketId);
 
     if (ix >= 0) {
       this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
+        if (p.id == socketId) {
+          if (p.id == socketId) {
+            if (this.sesiones[ix].game) {
+              const { processed, player } = this.sesiones[ix].game.players.getPlayerByIdentification(socketId)
+              if (processed) {
+                this.sesiones[ix].game.kickPlayer(player)
+              }
+            }
+          }
+        }
         return p.id != socketId;
       });
       return this.sesiones[ix].socketId;
@@ -40,12 +51,19 @@ class Sesiones {
 
   removePlayer(socketId, playerId) {
     const ix = this.getSesionFromSocketId(socketId);
-
     if (ix >= 0) {
       this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
+        if (p.id == playerId) {
+          if (this.sesiones[ix].game) {
+            const { processed, player } = this.sesiones[ix].game.players.getPlayerByIdentification(p.id)
+            if (processed) {
+              this.sesiones[ix].game.kickPlayer(player)
+            }
+          }
+        }
         return p.id != playerId;
       });
-      return true;
+      return ix;
     }
     return -1;
   }
@@ -121,11 +139,11 @@ class Sesiones {
     return ix
   }
 
-  crearNewGameToSession(socketId) {
+  crearNewGameToSession(socketId,strikes) {
     const ix = this.getSesionFromSocketId(socketId);
     if (ix != -1) {
-        const jugadores = this.sesiones[ix].players;
-        this.sesiones[ix].game = new Game(jugadores,this.sesiones[ix].ronda++,true);
+      const jugadores = this.sesiones[ix].players;
+      this.sesiones[ix].game = new Game(jugadores, this.sesiones[ix].ronda++, true, strikes);
     }
     return ix;
   }
