@@ -67,32 +67,38 @@ class Game {
   }
 
   kickPlayer(jugador) {
-    const _cartasMano = this.players.getCartasByJugador(jugador).cartas
-    this.pila = this.pila.concat(_cartasMano)
-    this.pila = this.mezclarBarajas(this.pila);
+    const _cartasMano = this.players.getCartasByJugador(jugador)
+    if (_cartasMano.processed) {
+      this.pila = this.pila.concat(_cartasMano.cartas)
+      this.pila = this.mezclarBarajas(this.pila);
+    }
     const position = this.players.getIndexByJugador(jugador)
     this.players.quitarJugadorByJugador(jugador);
     this.elJuego.ronda = this.elJuego.ronda % this.elJuego.jugadores
     this.elJuego.jugadores = this.elJuego.jugadores - 1;
 
-    if (this.elJuego.direccion) {
-      if (position < this.elJuego.ronda) {
-        if (this.elJuego.ronda > 0) {
-          this.elJuego.ronda = this.elJuego.ronda - 1
-        } else {
-          this.elJuego.ronda = this.elJuego.jugadores - 1
+    if (position >= 0) {
+      if (this.elJuego.direccion) {
+        if (position < this.elJuego.ronda) {
+          if (this.elJuego.ronda > 0) {
+            this.elJuego.ronda = this.elJuego.ronda - 1
+          } else {
+            this.elJuego.ronda = this.elJuego.jugadores - 1
+          }
         }
-      }
-    } else {
-      if (position <= this.elJuego.ronda) {
-        this.elJuego.ronda = this.elJuego.ronda - 1
+      } else {
+        if (position <= this.elJuego.ronda) {
+          this.elJuego.ronda = this.elJuego.ronda - 1
+        }
       }
     }
 
     const result = this.players.getPlayerById(
       this.elJuego.ronda % this.elJuego.jugadores
     );
-    this.elJuego.turno = result.player.nombre;
+    if (result.processed == true) {
+      this.elJuego.turno = result.player.nombre;
+    }
   }
 
   procesarPrimeraCarta() {
@@ -242,10 +248,10 @@ class Game {
           this.elJuego.penalidad = 0;
         }
 
-        if(this.elJuego.strikes != 0){
+        if (this.elJuego.strikes != 0) {
           jugador.strikes += 1
           //console.log(jugador.nombre, jugador.strikes)
-          if(jugador.strikes > this.elJuego.strikes){
+          if (jugador.strikes > this.elJuego.strikes) {
             this.perdedores.push({ nombre: jugador.nombre, id: jugador.id });
             this.kickPlayer(jugador)
 
