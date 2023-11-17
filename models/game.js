@@ -93,11 +93,13 @@ class Game {
       }
     }
 
-    const result = this.players.getPlayerById(
-      this.elJuego.ronda % this.elJuego.jugadores
-    );
-    if (result.processed == true) {
-      this.elJuego.turno = result.player.nombre;
+    if (!this.elJuego.finalizo) {
+      const result = this.players.getPlayerById(
+        this.elJuego.ronda % this.elJuego.jugadores
+      );
+      if (result.processed == true) {
+        this.elJuego.turno = result.player.nombre;
+      }
     }
   }
 

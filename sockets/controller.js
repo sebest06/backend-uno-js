@@ -83,7 +83,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             participantes.push(dato);
         });
 
-        sesiones.sesiones[ix].game.players.jugadores.forEach((p) => {
+        sesiones.sesiones[ix].game.players.jugadores.forEach((p, p_index) => {
             const pay = {
                 socketId: p.id,
                 cartas: p.cartas,
@@ -91,6 +91,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 saidUno: p.saidUno,
                 nombre: p.nombre,
                 jugando: !sesiones.sesiones[ix].game.elJuego.finalizo,
+                miturno: p_index == (sesiones.sesiones[ix].game.elJuego.ronda % sesiones.sesiones[ix].game.players.jugadores.length) ? true : false,
                 turno: {
                     nombre: sesiones.sesiones[ix].game.elJuego.turno,
                     turno:
@@ -108,7 +109,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             }
         });
 
-        sesiones.sesiones[ix].game.ganadores.forEach((p) => {
+        sesiones.sesiones[ix].game.ganadores.forEach((p, p_index) => {
             const pay = {
                 socketId: p.id,
                 cartas: [],
@@ -116,6 +117,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 saidUno: true,
                 nombre: p.nombre,
                 jugando: false,
+                miturno: false,
                 turno: {
                     nombre: sesiones.sesiones[ix].game.elJuego.turno,
                     turno:
@@ -133,7 +135,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
             }
         });
 
-        sesiones.sesiones[ix].game.perdedores.forEach((p) => {
+        sesiones.sesiones[ix].game.perdedores.forEach((p, p_index) => {
             const pay = {
                 socketId: p.id,
                 cartas: [],
@@ -141,6 +143,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 saidUno: true,
                 nombre: p.nombre,
                 jugando: false,
+                miturno: false,
                 turno: {
                     nombre: sesiones.sesiones[ix].game.elJuego.turno,
                     turno:
@@ -178,7 +181,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     };*/
 
     socket.on("startGame", (payload) => {
-        const ix = sesiones.crearNewGameToSession(socket.id, (payload&&payload.hasOwnProperty('strikes'))?payload.strikes:3);
+        const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
         if (ix != -1) {
             updateMesaByIx(ix)
         }
