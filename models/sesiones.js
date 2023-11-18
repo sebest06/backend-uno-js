@@ -2,7 +2,7 @@ const Game = require("./game");
 
 class Persona {
   constructor(nombre, role) {
-    this.nombre = nombre.slice(0,35);
+    this.nombre = nombre.slice(0, 35);
     this.role = role;
   }
 }
@@ -25,6 +25,13 @@ class Sesiones {
   /*Devuelve el SocketId de la mesa*/
   removerSesionesBySocketId(socketId) {
     this.sesiones = this.sesiones.filter((sesion) => {
+      if (sesion.socketId == socketId) {
+        sesion.players = [];
+        if (sesion.game != null) {
+          sesion.game.deleteGame();
+          sesion.game = null;
+        }
+      }
       return sesion.socketId != socketId;
     });
 
@@ -35,9 +42,12 @@ class Sesiones {
         if (p.id == socketId) {
           if (p.id == socketId) {
             if (this.sesiones[ix].game) {
-              const { processed, player } = this.sesiones[ix].game.players.getPlayerByIdentification(socketId)
+              const { processed, player } =
+                this.sesiones[ix].game.players.getPlayerByIdentification(
+                  socketId
+                );
               if (processed) {
-                this.sesiones[ix].game.kickPlayer(player)
+                this.sesiones[ix].game.kickPlayer(player);
               }
             }
           }
@@ -55,9 +65,11 @@ class Sesiones {
       this.sesiones[ix].players = this.sesiones[ix].players.filter((p) => {
         if (p.id == playerId) {
           if (this.sesiones[ix].game) {
-            const { processed, player } = this.sesiones[ix].game.players.getPlayerByIdentification(p.id)
+            const { processed, player } = this.sesiones[
+              ix
+            ].game.players.getPlayerByIdentification(p.id);
             if (processed) {
-              this.sesiones[ix].game.kickPlayer(player)
+              this.sesiones[ix].game.kickPlayer(player);
             }
           }
         }
@@ -116,7 +128,7 @@ class Sesiones {
 
     if (ix >= 0) {
       this.sesiones[ix].players.push({
-        nombre: nombre.slice(0,35),
+        nombre: nombre.slice(0, 35),
         role: "",
         id: socketId,
       });
@@ -136,14 +148,19 @@ class Sesiones {
       );
     });
 
-    return ix
+    return ix;
   }
 
-  crearNewGameToSession(socketId,strikes) {
+  crearNewGameToSession(socketId, strikes) {
     const ix = this.getSesionFromSocketId(socketId);
     if (ix != -1) {
       const jugadores = this.sesiones[ix].players;
-      this.sesiones[ix].game = new Game(jugadores, this.sesiones[ix].ronda++, true, strikes);
+      this.sesiones[ix].game = new Game(
+        jugadores,
+        this.sesiones[ix].ronda++,
+        true,
+        strikes
+      );
     }
     return ix;
   }

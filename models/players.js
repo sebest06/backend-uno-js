@@ -25,6 +25,10 @@ class Players {
         })
     }
 
+    deletePlayers() {
+        this.jugadores = [];
+    }
+
     getIndexPlayerByNombre(nombre = "") {
         let ix = this.jugadores.findIndex(p => {
             return p.nombre === nombre

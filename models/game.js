@@ -66,6 +66,14 @@ class Game {
     this.procesarPrimeraCarta();
   }
 
+  deleteGame() {
+    this.ganadores = []
+    this.perdedores = []
+    this.pila = []
+    this.players.deletePlayers()
+    this.players = null
+  }
+
   kickPlayer(jugador) {
     const _cartasMano = this.players.getCartasByJugador(jugador)
     if (_cartasMano.processed) {
