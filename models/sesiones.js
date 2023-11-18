@@ -2,7 +2,7 @@ const Game = require("./game");
 
 class Persona {
   constructor(nombre, role) {
-    this.nombre = nombre;
+    this.nombre = nombre.slice(0,35);
     this.role = role;
   }
 }
@@ -116,7 +116,7 @@ class Sesiones {
 
     if (ix >= 0) {
       this.sesiones[ix].players.push({
-        nombre: nombre,
+        nombre: nombre.slice(0,35),
         role: "",
         id: socketId,
       });
