@@ -40,7 +40,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     });
 
     socket.on("joinMesa", (payload) => {
-        if (payload.nombre && payload.code) {
+        if (payload.nombre !== undefined && payload.code !== undefined) {
             if (sesiones.addPlayerToSession(payload.nombre, payload.code, socket.id)) {
                 socket.emit("joinMesa", socket.id);
                 const MesaSockeId = sesiones.getMesaSocketId(payload.code);
