@@ -85,28 +85,31 @@ class Game {
     this.elJuego.ronda = this.elJuego.ronda % this.elJuego.jugadores
     this.elJuego.jugadores = this.elJuego.jugadores - 1;
 
-    if (position >= 0) {
-      if (this.elJuego.direccion) {
-        if (position < this.elJuego.ronda) {
-          if (this.elJuego.ronda > 0) {
+    if (this.elJuego.jugadores > 0) {
+
+      if (position >= 0) {
+        if (this.elJuego.direccion) {
+          if (position < this.elJuego.ronda) {
+            if (this.elJuego.ronda > 0) {
+              this.elJuego.ronda = this.elJuego.ronda - 1
+            } else {
+              this.elJuego.ronda = this.elJuego.jugadores - 1
+            }
+          }
+        } else {
+          if (position <= this.elJuego.ronda) {
             this.elJuego.ronda = this.elJuego.ronda - 1
-          } else {
-            this.elJuego.ronda = this.elJuego.jugadores - 1
           }
         }
-      } else {
-        if (position <= this.elJuego.ronda) {
-          this.elJuego.ronda = this.elJuego.ronda - 1
-        }
       }
-    }
 
-    if (!this.elJuego.finalizo) {
-      const result = this.players.getPlayerById(
-        this.elJuego.ronda % this.elJuego.jugadores
-      );
-      if (result.processed == true) {
-        this.elJuego.turno = result.player.nombre;
+      if (!this.elJuego.finalizo) {
+        const result = this.players.getPlayerById(
+          this.elJuego.ronda % this.elJuego.jugadores
+        );
+        if (result.processed == true) {
+          this.elJuego.turno = result.player.nombre;
+        }
       }
     }
   }

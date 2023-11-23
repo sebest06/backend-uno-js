@@ -13,7 +13,7 @@ const { Sesiones } = require("../models/sesiones");
     [x] El administrador empieza o reinicia el partido
     [ ] El administrador puede pasar un turno
     [x] El administrador puede echar a un jugador
-    [ ] Cuando se desconecte un jugador que este jugando, deberia quitarle las cartas, borrarlo de los jugadores y mezclar en la baraja sus cartas
+    [x] Cuando se desconecte un jugador que este jugando, deberia quitarle las cartas, borrarlo de los jugadores y mezclar en la baraja sus cartas
 */
 let sesionesID = 1;
 
@@ -22,6 +22,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         const MesaSockeId = sesiones.removerSesionesBySocketId(socket.id);
         updateMesaAdmin(MesaSockeId);
         if (MesaSockeId != -1) {
+            //console.log("se desconecto un jugador de la mesa")
             updateMesaByIx(sesiones.getSesionFromSocketId(MesaSockeId))
         }
     });
@@ -73,8 +74,9 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     const updateMesaByIx = (ix) => {
         //const ix = sesiones.SesionIdByCode(payload.code);
         let participantes = [];
-        if(sesiones.sesiones[ix].game == null)
+        if(!sesiones.sesiones[ix].game && sesiones.sesiones[ix].game == null)
         {
+            console.log("No habia juego?")
             return;
         }
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
@@ -174,6 +176,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 if (sesiones.removePlayer(socket.id, payload.playerSocket) != -1) {
                     updateMesa(socket.id);
                     socket.to(payload.playerSocket).emit("disconnected");
+                    //console.log("se pateo a un jugador de la mesa")
                     updateMesaByIx(ix)
                 }
             }
@@ -187,6 +190,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     socket.on("startGame", (payload) => {
         const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
         if (ix != -1) {
+            //console.log("Se inicio un juego nuevo")
             updateMesaByIx(ix)
         }
     });
@@ -206,6 +210,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                         payload.color
                     )
                 );
+                //console.log("se jugo un carta")
                 updateMesaByIx(ix)
             }
         }
@@ -222,7 +227,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 sesiones.sesiones[ix].game.arbitrarJugada(
                     sesiones.sesiones[ix].game.levantarCartaDePila(player)
                 );
-
+                //console.log("un jugador levanto una carta")
                 updateMesaByIx(ix)
             }
         }
@@ -239,7 +244,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 sesiones.sesiones[ix].game.arbitrarJugada(
                     sesiones.sesiones[ix].game.pasarTurnoSinJugar(player)
                 );
-
+                //console.log("un jugador paso de turno")
                 updateMesaByIx(ix)
             }
         }
@@ -256,7 +261,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 sesiones.sesiones[ix].game.arbitrarJugada(
                     sesiones.sesiones[ix].game.decirUNO(player)
                 );
-
+                //console.log("un jugador dijo uno")
                 updateMesaByIx(ix)
             }
         }
@@ -278,7 +283,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                 sesiones.sesiones[ix].game.arbitrarJugada(
                     sesiones.sesiones[ix].game.reportarJugadorConUnaCarta(player, reportado.player)
                 );
-
+                //console.log("un jugador reporto a otro")
                 updateMesaByIx(ix)
             }
         }
