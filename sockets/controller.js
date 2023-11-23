@@ -73,6 +73,10 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     const updateMesaByIx = (ix) => {
         //const ix = sesiones.SesionIdByCode(payload.code);
         let participantes = [];
+        if(sesiones.sesiones[ix].game == null)
+        {
+            return;
+        }
         sesiones.sesiones[ix].game.players.jugadores.forEach((j) => {
             const dato = {
                 nombre: j.nombre,
