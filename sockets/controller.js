@@ -28,19 +28,24 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     });
 
     socket.on("addMesa", (payload) => {
-        if (sesiones.existeSesionBySocketId(socket.id) == -1) {
-            const dato = {
-                id: sesionesID++,
-                socketId: socket.id,
-                nombre: payload.nombre,
-            };
-            sesiones.addSesion(dato);
+        try {
+            if (sesiones.existeSesionBySocketId(socket.id) == -1) {
+                const dato = {
+                    id: sesionesID++,
+                    socketId: socket.id,
+                    nombre: payload.nombre,
+                };
+                sesiones.addSesion(dato);
+            }
+            socket.emit("addMesa", socket.id);
         }
-        socket.emit("addMesa", socket.id);
+        catch {
+            return
+        }
     });
 
     socket.on("joinMesa", (payload) => {
-        try{
+        try {
             if (payload.nombre !== undefined && payload.code !== undefined) {
                 if (sesiones.addPlayerToSession(payload.nombre, payload.code, socket.id)) {
                     socket.emit("joinMesa", socket.id);
@@ -51,12 +56,16 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         } catch {
             return;
         }
-        
-            
+
+
     });
 
     socket.on("getMesa", (payload) => {
-        updateMesa(payload.socketId);
+        try {
+            updateMesa(payload.socketId);
+        } catch {
+            return
+        }
     });
 
     const updateMesa = (MesaSockeId) => {
@@ -177,16 +186,20 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     }
 
     socket.on("kickPlayer", (payload) => {
-        if (socket.id != payload.playerSocket) {
-            const ix = sesiones.existeSesionBySocketId(socket.id);
-            if (ix != -1) {
-                if (sesiones.removePlayer(socket.id, payload.playerSocket) != -1) {
-                    updateMesa(socket.id);
-                    socket.to(payload.playerSocket).emit("disconnected");
-                    //console.log("se pateo a un jugador de la mesa")
-                    updateMesaByIx(ix)
+        try {
+            if (socket.id != payload.playerSocket) {
+                const ix = sesiones.existeSesionBySocketId(socket.id);
+                if (ix != -1) {
+                    if (sesiones.removePlayer(socket.id, payload.playerSocket) != -1) {
+                        updateMesa(socket.id);
+                        socket.to(payload.playerSocket).emit("disconnected");
+                        //console.log("se pateo a un jugador de la mesa")
+                        updateMesaByIx(ix)
+                    }
                 }
             }
+        } catch {
+            return
         }
     });
 
@@ -195,31 +208,38 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     };*/
 
     socket.on("startGame", (payload) => {
-        const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
-        if (ix != -1) {
-            //console.log("Se inicio un juego nuevo")
-            updateMesaByIx(ix)
+        try {
+            const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
+            if (ix != -1) {
+                //console.log("Se inicio un juego nuevo")
+                updateMesaByIx(ix)
+            }
+        } catch {
+            return
         }
     });
     socket.on("playCard", (payload) => {
         //chequear que sea la misma carta por las dudas
-
-        const ix = sesiones.SesionIdByCode(payload.code);
-        if (ix != -1) {
-            const { processed, player } = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerByIdentification(socket.id);
-            if (processed) {
-                sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.descartarCarta(
-                        player,
-                        player.cartas[payload.cart_index],
-                        payload.color
-                    )
-                );
-                //console.log("se jugo un carta")
-                updateMesaByIx(ix)
+        try {
+            const ix = sesiones.SesionIdByCode(payload.code);
+            if (ix != -1) {
+                const { processed, player } = sesiones.sesiones[
+                    ix
+                ].game.players.getPlayerByIdentification(socket.id);
+                if (processed) {
+                    sesiones.sesiones[ix].game.arbitrarJugada(
+                        sesiones.sesiones[ix].game.descartarCarta(
+                            player,
+                            player.cartas[payload.cart_index],
+                            payload.color
+                        )
+                    );
+                    //console.log("se jugo un carta")
+                    updateMesaByIx(ix)
+                }
             }
+        } catch {
+            return
         }
     });
 
