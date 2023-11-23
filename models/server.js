@@ -41,6 +41,10 @@ class Server {
         // Directorio Público
         this.app.use( express.static('public') );
 
+        this.app.get('/estadisticas', (req, res) => {
+            res.send('Run: '+ this.sesiones.run_since.toLocaleString() + '<br>Jugados: '+ this.sesiones.counter_games + '<br> Players: <ul>' + this.sesiones.ultimos_creadores.map(p => {return "<li>" + p.nombre + "=>" + p.hora.toLocaleString() + "</li>"}).join('') + "</ul>")
+        })
+
     }
 
     listen() {

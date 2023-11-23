@@ -20,6 +20,9 @@ class Sesion {
 class Sesiones {
   constructor() {
     this.sesiones = [];
+    this.counter_games = 0;
+    this.ultimos_creadores = [];
+    this.run_since = new Date();
   }
 
   /*Devuelve el SocketId de la mesa*/
@@ -102,6 +105,8 @@ class Sesiones {
 
   addSesion(sesion) {
     this.sesiones.push(new Sesion(sesion.id, sesion.socketId, sesion.nombre));
+    this.ultimos_creadores.push({nombre: sesion.nombre, hora: new Date()});
+    this.ultimos_creadores = this.ultimos_creadores.slice(-20);
   }
 
   getSesiones() {
@@ -161,6 +166,7 @@ class Sesiones {
         true,
         strikes
       );
+      this.counter_games++;
     }
     return ix;
   }
