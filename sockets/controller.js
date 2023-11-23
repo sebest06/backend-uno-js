@@ -40,10 +40,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     });
 
     socket.on("joinMesa", (payload) => {
-        if (sesiones.addPlayerToSession(payload.nombre, payload.code, socket.id)) {
-            socket.emit("joinMesa", socket.id);
-            const MesaSockeId = sesiones.getMesaSocketId(payload.code);
-            updateMesaAdmin(MesaSockeId);
+        if (payload.nombre && payload.code) {
+            if (sesiones.addPlayerToSession(payload.nombre, payload.code, socket.id)) {
+                socket.emit("joinMesa", socket.id);
+                const MesaSockeId = sesiones.getMesaSocketId(payload.code);
+                updateMesaAdmin(MesaSockeId);
+            }
         }
     });
 
@@ -74,8 +76,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     const updateMesaByIx = (ix) => {
         //const ix = sesiones.SesionIdByCode(payload.code);
         let participantes = [];
-        if(!sesiones.sesiones[ix].game && sesiones.sesiones[ix].game == null)
-        {
+        if (!sesiones.sesiones[ix].game && sesiones.sesiones[ix].game == null) {
             console.log("No habia juego?")
             return;
         }
