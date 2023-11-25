@@ -35,7 +35,7 @@ class Players {
         })
         return ix
     }
-    getIndexByJugador(jugador = new Player()) {
+    getIndexByJugador(jugador) {
         let ix = this.jugadores.findIndex(p => {
             return p === jugador
         })
@@ -136,7 +136,7 @@ class Players {
         }
         return this.darCartaByIndex(ix, cartas)
     }
-    darCartaByJugador(jugador = new Player(), cartas = []) {
+    darCartaByJugador(jugador, cartas = []) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -168,7 +168,7 @@ class Players {
         }
     }
 
-    quitarUnoByJugador(jugador = new Player()) {
+    quitarUnoByJugador(jugador) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -227,7 +227,7 @@ class Players {
         }
         return this.descartarCartaByIndex(ix, cartas)
     }
-    descartarCartaByJugador(jugador = new Player(), cartas = []) {
+    descartarCartaByJugador(jugador, cartas = []) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -267,7 +267,7 @@ class Players {
         }
         return this.getCartasById(ix)
     }
-    getCartasByJugador(jugador = new Player()) {
+    getCartasByJugador(jugador) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -308,7 +308,7 @@ class Players {
         return this.decirUnoById(ix)
     }
 
-    decirUnoByJugador(jugador = new Player()) {
+    decirUnoByJugador(jugador) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -348,7 +348,7 @@ class Players {
         return this.dijoUnoById(ix)
     }
 
-    dijoUnoByJugador(jugador = new Player()) {
+    dijoUnoByJugador(jugador) {
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {
             return {
@@ -358,7 +358,7 @@ class Players {
         return this.dijoUnoById(ix)
     }
 
-    quitarJugadorByJugador(jugador = new Player()) {
+    quitarJugadorByJugador(jugador) {
 
         let ix = this.getIndexByJugador(jugador)
         if (ix < 0) {

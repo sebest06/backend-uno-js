@@ -423,7 +423,7 @@ class Game {
     this.elJuego.turno = player.nombre;
   }
 
-  levantarCartaDePila(jugador = new Player(), n = 1) {
+  levantarCartaDePila(jugador, n = 1) {
     if (this.pila.length <= n) {
       const descartes = this.descarte.slice(1)
       this.pila = this.pila.concat(descartes)
@@ -459,9 +459,20 @@ class Game {
     }
   }
 
-  descartarCarta(jugador = new Player(), carta, color) {
+  descartarCarta(jugador, carta, color) {
     let estado = "descarto";
     if (!jugador.cartas.includes(carta)) {
+      return {
+        carta,
+        jugador,
+        estado,
+        color,
+        penalizado: true,
+      };
+    }
+
+    if(carta.color == "negro" && !["rojo","azul","amarillo","verde"].includes(color))
+    {
       return {
         carta,
         jugador,
@@ -523,7 +534,7 @@ class Game {
       };
     }
   }
-  pasarTurnoSinJugar(jugador = new Player()) {
+  pasarTurnoSinJugar(jugador) {
     let estado = "paso";
     if (
       (this.elJuego.levanto || this.elJuego.penalidad) &&
@@ -543,7 +554,7 @@ class Game {
     }
   }
 
-  decirUNO(jugador = new Player()) {
+  decirUNO(jugador) {
     let estado = "uno";
     if (jugador.cartas.length < 2) {
       return {
@@ -560,7 +571,7 @@ class Game {
     }
   }
 
-  reportarJugadorConUnaCarta(jugador = new Player(), reportado = new Player()) {
+  reportarJugadorConUnaCarta(jugador, reportado) {
     let estado = "reporto";
 
     if (
