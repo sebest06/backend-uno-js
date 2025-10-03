@@ -121,6 +121,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                         sesiones.sesiones[ix].game.players.jugadores.length,
                 },
                 descarte: sesiones.sesiones[ix].game.descarte,
+                crowns: p.crowns,
                 players: participantes,
                 ganadores: sesiones.sesiones[ix].game.ganadores,
             };
@@ -147,6 +148,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                         sesiones.sesiones[ix].game.players.jugadores.length,
                 },
                 descarte: sesiones.sesiones[ix].game.descarte,
+                crowns: p.crowns,
                 players: participantes,
                 ganadores: sesiones.sesiones[ix].game.ganadores,
             };
@@ -173,6 +175,7 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                         sesiones.sesiones[ix].game.players.jugadores.length,
                 },
                 descarte: sesiones.sesiones[ix].game.descarte,
+                crowns: p.crowns,
                 players: participantes,
                 ganadores: sesiones.sesiones[ix].game.ganadores,
             };
@@ -203,10 +206,6 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         }
     });
 
-    /*const sendGameStatus = (socket, evento, payload) => {
-      socket.to(socket).emit(evento, payload);
-    };*/
-
     socket.on("startGame", (payload) => {
         try {
             const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
@@ -236,6 +235,12 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                     );
                     //console.log("se jugo un carta")
                     updateMesaByIx(ix)
+                    let sesionplayer_ix = sesiones.sesiones[ix].players.findIndex(p => {
+                      return p.id === player.id
+                    })
+                    if(player.won == true){
+                        sesiones.sesiones[ix].players[sesionplayer_ix].crowns += 1
+                    }
                 }
             }
         } catch {

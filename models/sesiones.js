@@ -4,6 +4,7 @@ class Persona {
   constructor(nombre, role) {
     this.nombre = nombre.slice(0, 35);
     this.role = role;
+    this.crowns = 5;
   }
 }
 
@@ -11,7 +12,7 @@ class Sesion {
   constructor(id, socketId, administrador, game = null) {
     this.id = id; //Este Id es solo para tener un orden
     this.socketId = socketId; //Esto es el link
-    this.players = [{ nombre: administrador, role: "admin", id: socketId }]; //Es la lista de los nombres de los jugadores
+    this.players = [{ nombre: administrador, role: "admin", id: socketId, crowns: 0 }]; //Es la lista de los nombres de los jugadores
     this.game = game; //Es el juego en curso
     this.ronda = 0;
   }
@@ -136,6 +137,7 @@ class Sesiones {
         nombre: nombre.slice(0, 35),
         role: "",
         id: socketId,
+        crowns: 0,
       });
       return true;
     }

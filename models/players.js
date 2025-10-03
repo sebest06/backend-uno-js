@@ -1,10 +1,12 @@
 class Player {
-    constructor({ id, nombre, cartas = [] }) {
+    constructor({ id, nombre, cartas = [], crowns = 0 }) {
         this.nombre = nombre;
         this.saidUno = false;
         this.cartas = cartas;
         this.id = id;
         this.strikes = 0;
+        this.crowns = crowns;
+        this.won = 0;
     }
 }
 
@@ -19,7 +21,9 @@ class Players {
                 id: jugador.id ? jugador.id : ix++,
                 nombre: jugador.nombre,
                 cartas: [],
-                saidUno: false
+                saidUno: false,
+                won: 0,
+                crowns: jugador.crowns ? jugador.crowns : 0
             });
             this.jugadores.push(unPlayer);
         })

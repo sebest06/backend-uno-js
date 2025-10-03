@@ -221,7 +221,10 @@ class Game {
         }
 
         if (this.players.getCartasByJugador(jugador).cartas.length == 0) {
-          this.ganadores.push({ nombre: jugador.nombre, id: jugador.id, strikes: jugador.strikes });
+          if(this.ganadores.length == 0){
+            jugador.won = true;
+          }
+          this.ganadores.push({ nombre: jugador.nombre, id: jugador.id, strikes: jugador.strikes, crowns: jugador.crowns, won: jugador.won });
           this.players.quitarJugadorByJugador(jugador);
           this.elJuego.jugadores = this.elJuego.jugadores - 1;
 
