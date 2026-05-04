@@ -27,9 +27,9 @@ class Game {
         [x] Que pasa cuando no hay mas cartas para robar
         [x] No estoy ejecutando ninguna resolucion con la primer carta del descarte
         [x] Combos de cartas
-        [ ] Deberia tener que poder descartar diciendo uno, para que no se haga en dos eventos distintos
-        [ ] Tengo que marcar que dijo uno un jugador penalizado por no decir uno
-        [ ] Tengo que quitar la bandera de que dijo uno, cuando el jugador es penalizado por jugar mal
+        [x] Deberia tener que poder descartar diciendo uno, para que no se haga en dos eventos distintos
+        [x] Tengo que marcar que dijo uno un jugador penalizado por no decir uno (darCartaByIndex ya lo resetea)
+        [x] Tengo que quitar la bandera de que dijo uno, cuando el jugador es penalizado por jugar mal (darCartaByIndex ya lo resetea)
   */
 
   constructor(jugadores = [], ronda = 0, espejito = 0, strikes = 0) {

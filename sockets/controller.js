@@ -19,10 +19,17 @@ let sesionesID = 1;
 
 const socketController = (socket, sesiones = new Sesiones()) => {
     socket.on("disconnect", () => {
+        // Si este socket es dueño de una sala, notifica a los jugadores antes de eliminarla
+        const adminIx = sesiones.existeSesionBySocketId(socket.id);
+        if (adminIx >= 0) {
+            sesiones.sesiones[adminIx].players
+                .filter(p => p.id !== socket.id)
+                .forEach(p => socket.to(p.id).emit("disconnected"));
+        }
+
         const MesaSockeId = sesiones.removerSesionesBySocketId(socket.id);
         updateMesaAdmin(MesaSockeId);
         if (MesaSockeId != -1) {
-            //console.log("se desconecto un jugador de la mesa")
             updateMesaByIx(sesiones.getSesionFromSocketId(MesaSockeId))
         }
     });
@@ -46,8 +53,14 @@ const socketController = (socket, sesiones = new Sesiones()) => {
 
     socket.on("joinMesa", (payload) => {
         try {
-            if (payload.nombre !== undefined && payload.code !== undefined) {
-                if (sesiones.addPlayerToSession(payload.nombre, payload.code, socket.id)) {
+            if (
+                payload.nombre !== undefined &&
+                payload.code !== undefined &&
+                typeof payload.nombre === "string" &&
+                payload.nombre.trim().length > 0 &&
+                payload.nombre.trim().length <= 20
+            ) {
+                if (sesiones.addPlayerToSession(payload.nombre.trim(), payload.code, socket.id)) {
                     socket.emit("joinMesa", socket.id);
                     const MesaSockeId = sesiones.getMesaSocketId(payload.code);
                     updateMesaAdmin(MesaSockeId);
@@ -208,7 +221,10 @@ const socketController = (socket, sesiones = new Sesiones()) => {
 
     socket.on("startGame", (payload) => {
         try {
-            const ix = sesiones.crearNewGameToSession(socket.id, (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3);
+            let strikes = (payload && payload.hasOwnProperty('strikes')) ? payload.strikes : 3;
+            strikes = parseInt(strikes, 10);
+            if (isNaN(strikes) || strikes < 0) strikes = 3;
+            const ix = sesiones.crearNewGameToSession(socket.id, strikes);
             if (ix != -1) {
                 //console.log("Se inicio un juego nuevo")
                 updateMesaByIx(ix)
@@ -218,7 +234,6 @@ const socketController = (socket, sesiones = new Sesiones()) => {
         }
     });
     socket.on("playCard", (payload) => {
-        //chequear que sea la misma carta por las dudas
         try {
             const ix = sesiones.SesionIdByCode(payload.code);
             if (ix != -1) {
@@ -226,14 +241,20 @@ const socketController = (socket, sesiones = new Sesiones()) => {
                     ix
                 ].game.players.getPlayerByIdentification(socket.id);
                 if (processed) {
-                    sesiones.sesiones[ix].game.arbitrarJugada(
+                    const cart_index = parseInt(payload.cart_index, 10);
+                    if (isNaN(cart_index) || cart_index < 0 || cart_index >= player.cartas.length) return;
+                    const resultado = sesiones.sesiones[ix].game.arbitrarJugada(
                         sesiones.sesiones[ix].game.descartarCarta(
                             player,
-                            player.cartas[payload.cart_index],
+                            player.cartas[cart_index],
                             payload.color
                         )
                     );
-                    //console.log("se jugo un carta")
+                    if (resultado && !resultado.penalizado && payload.sayUno) {
+                        sesiones.sesiones[ix].game.arbitrarJugada(
+                            sesiones.sesiones[ix].game.decirUNO(player)
+                        );
+                    }
                     updateMesaByIx(ix)
                     let sesionplayer_ix = sesiones.sesiones[ix].players.findIndex(p => {
                       return p.id === player.id
@@ -249,75 +270,83 @@ const socketController = (socket, sesiones = new Sesiones()) => {
     });
 
     socket.on("playPick", (payload) => {
-        //chequear que sea la misma carta por las dudas
-        const ix = sesiones.SesionIdByCode(payload.code);
-        if (ix != -1) {
-            const { processed, player } = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerByIdentification(socket.id);
-            if (processed) {
-                sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.levantarCartaDePila(player)
-                );
-                //console.log("un jugador levanto una carta")
-                updateMesaByIx(ix)
+        try {
+            const ix = sesiones.SesionIdByCode(payload.code);
+            if (ix != -1) {
+                const { processed, player } = sesiones.sesiones[
+                    ix
+                ].game.players.getPlayerByIdentification(socket.id);
+                if (processed) {
+                    sesiones.sesiones[ix].game.arbitrarJugada(
+                        sesiones.sesiones[ix].game.levantarCartaDePila(player)
+                    );
+                    updateMesaByIx(ix)
+                }
             }
+        } catch {
+            return
         }
     });
 
     socket.on("playPass", (payload) => {
-        //chequear que sea la misma carta por las dudas
-        const ix = sesiones.SesionIdByCode(payload.code);
-        if (ix != -1) {
-            const { processed, player } = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerByIdentification(socket.id);
-            if (processed) {
-                sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.pasarTurnoSinJugar(player)
-                );
-                //console.log("un jugador paso de turno")
-                updateMesaByIx(ix)
+        try {
+            const ix = sesiones.SesionIdByCode(payload.code);
+            if (ix != -1) {
+                const { processed, player } = sesiones.sesiones[
+                    ix
+                ].game.players.getPlayerByIdentification(socket.id);
+                if (processed) {
+                    sesiones.sesiones[ix].game.arbitrarJugada(
+                        sesiones.sesiones[ix].game.pasarTurnoSinJugar(player)
+                    );
+                    updateMesaByIx(ix)
+                }
             }
+        } catch {
+            return
         }
     });
 
     socket.on("playUNO", (payload) => {
-        //chequear que sea la misma carta por las dudas
-        const ix = sesiones.SesionIdByCode(payload.code);
-        if (ix != -1) {
-            const { processed, player } = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerByIdentification(socket.id);
-            if (processed) {
-                sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.decirUNO(player)
-                );
-                //console.log("un jugador dijo uno")
-                updateMesaByIx(ix)
+        try {
+            const ix = sesiones.SesionIdByCode(payload.code);
+            if (ix != -1) {
+                const { processed, player } = sesiones.sesiones[
+                    ix
+                ].game.players.getPlayerByIdentification(socket.id);
+                if (processed) {
+                    sesiones.sesiones[ix].game.arbitrarJugada(
+                        sesiones.sesiones[ix].game.decirUNO(player)
+                    );
+                    updateMesaByIx(ix)
+                }
             }
+        } catch {
+            return
         }
     });
 
     socket.on("reportarUNO", (payload) => {
-        //chequear que sea la misma carta por las dudas
-        const ix = sesiones.SesionIdByCode(payload.code);
-        if (ix != -1) {
-            const { processed, player } = sesiones.sesiones[
-                ix
-            ].game.players.getPlayerByIdentification(socket.id);
-
-            if (processed) {
-                const reportado = sesiones.sesiones[
+        try {
+            const ix = sesiones.SesionIdByCode(payload.code);
+            if (ix != -1) {
+                const { processed, player } = sesiones.sesiones[
                     ix
-                ].game.players.getPlayerById(payload.jugador)
-
-                sesiones.sesiones[ix].game.arbitrarJugada(
-                    sesiones.sesiones[ix].game.reportarJugadorConUnaCarta(player, reportado.player)
-                );
-                //console.log("un jugador reporto a otro")
-                updateMesaByIx(ix)
+                ].game.players.getPlayerByIdentification(socket.id);
+                if (processed) {
+                    const jugador_ix = parseInt(payload.jugador, 10);
+                    const total = sesiones.sesiones[ix].game.players.jugadores.length;
+                    if (isNaN(jugador_ix) || jugador_ix < 0 || jugador_ix >= total) return;
+                    const reportado = sesiones.sesiones[ix].game.players.getPlayerById(jugador_ix);
+                    if (!reportado.player) return;
+                    sesiones.sesiones[ix].game.arbitrarJugada(
+                        sesiones.sesiones[ix].game.reportarJugadorConUnaCarta(player, reportado.player)
+                    );
+                    updateMesaByIx(ix)
+                }
             }
+        } catch {
+            return
         }
     });
 
